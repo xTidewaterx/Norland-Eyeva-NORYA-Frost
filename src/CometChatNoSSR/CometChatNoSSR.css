@@ -1,0 +1,46 @@
+/* Layout for the main conversations and messages container */
+.conversations-with-messages {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* Sidebar wrapper for conversations */
+.conversations-wrapper {
+    height: 100%;
+    width: 480px; /* Fixed width for conversation list */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+}
+
+/* Hide overflow for the conversation list */
+.conversations-wrapper > .cometchat {
+    overflow: hidden;
+}
+
+/* Message section layout */
+.messages-wrapper {
+    width: calc(100% - 480px); /* Take remaining space */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Display styling for when no conversation is selected */
+.empty-conversation {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    color: var(--cometchat-text-color-secondary, #727272);
+    font: var(--cometchat-font-body-regular, 400 14px Roboto);
+}
+
+/* Ensure message composer does not have rounded corners */
+.cometchat .cometchat-message-composer {
+    border-radius: 0px;
+}

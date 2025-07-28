@@ -1,0 +1,64 @@
+/* Style for the icon in the header menu of the conversation list */
+.selector-wrapper .cometchat-conversations .cometchat-list__header-menu .cometchat-button__icon {
+    background: var(--cometchat-icon-color-primary);
+}
+
+/* Change background color of icon on hover */
+.cometchat-conversations .cometchat-list__header-menu .cometchat-button__icon:hover {
+    background: var(--cometchat-icon-color-highlight);
+}
+
+/* Remove the right border from the search bar */
+.cometchat-list__header-search-bar {
+    border-right: none;
+}
+
+/* Align submenu items to the left */
+.cometchat .cometchat-menu-list__sub-menu-list-item {
+    text-align: left;
+}
+
+/* Set specific width and positioning for submenu list */
+.cometchat .cometchat-conversations .cometchat-menu-list__sub-menu-list {
+    width: 212px;
+    top: 40px !important;
+    left: 172px !important;
+}
+
+/* Style the logged-in user section with a bottom border */
+#logged-in-user {
+    border-bottom: 2px solid var(--cometchat-border-color-default, #E8E8E8);
+}
+
+/* Prevent cursor interaction on logged-in user menu items */
+#logged-in-user .cometchat-menu-list__sub-menu-item-title,
+#logged-in-user .cometchat-menu-list__sub-menu-list-item {
+    cursor: default;
+}
+
+/* Style for logout icon with error color */
+.cometchat-menu-list__sub-menu-list-item-icon-log-out {
+    background-color: var(--cometchat-error-color, #F44649);
+}
+
+/* Style for logout text with error color */
+.cometchat-menu-list__sub-menu-item-title-log-out {
+    color: var(--cometchat-error-color, #F44649);
+}
+
+/* Allow pointer interaction on submenu items inside chat menu */
+.chat-menu .cometchat .cometchat-menu-list__sub-menu-item-title {
+    cursor: pointer;
+}
+
+/* Remove shadow from submenu inside chat menu */
+.chat-menu .cometchat .cometchat-menu-list__sub-menu {
+    box-shadow: none;
+}
+
+/* Style for submenu icons inside chat menu */
+.chat-menu .cometchat .cometchat-menu-list__sub-menu-icon {
+    background-color: var(--cometchat-icon-color-primary, #141414);
+    width: 24px;
+    height: 24px;
+}
