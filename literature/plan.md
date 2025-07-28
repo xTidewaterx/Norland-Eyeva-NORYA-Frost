@@ -1,1 +1,0 @@
-build mvp with the simples possible solutions, while still reaching the end goal of a sensible Norland MVP 
