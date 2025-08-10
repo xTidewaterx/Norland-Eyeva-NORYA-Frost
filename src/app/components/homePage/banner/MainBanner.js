@@ -93,18 +93,18 @@ export default function MainBanner() {
           className="object-cover z-0"
         />
 
-        <h2
-          ref={textRef}
-          className="text-white p-12 text-8xl mb-0 z-10 relative"
-        >
-          NORYA
-        </h2>
+     <h2
+  ref={textRef}
+  className="text-white p-12 text-8xl mb-0 z-10 relative [@media(min-width:2000px)]:text-[10rem]"
+>
+  NORYA
+</h2>
 
-        <div
-          ref={revealRef}
-          className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mt-6 text-center p-4 z-20"
-        >
-        </div>
+<div
+  ref={revealRef}
+  className="text-white max-w-496 text-3xl sm:text-4xl md:text-3xl lg:text-2xl xl:text-7xl mt-6 text-center p-4 z-20 [@media(min-width:2000px)]:text-[5rem]"
+>
+</div>
 
         {/* Promises anchored near bottom of banner */}
         <div className="absolute bottom-6 left-0 right-0 flex justify-center z-40">
