@@ -1,23 +1,36 @@
 'use client';
 
-import useSWR from 'swr';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const fetcher = (url) =>
-  fetch(url).then((res) => {
-    if (!res.ok) throw new Error('Network error');
-    return res.json();
-  });
+const products = [
+  {
+    id: 'prod_001',
+    name: 'Arctic Beanie',
+    price: 199,
+    images: ['https://cdn.booniez.com/i/d/dale-of-norway-valle-sweater-bla-7868-f'],
+  },
+  {
+    id: 'prod_002',
+    name: 'Nordic Hoodie',
+    price: 499,
+    images: ['https://eu.daleofnorway.com/globalassets/dale-of-norway/produktbilder/81951-christiania-womens-jacket/81951_d00_life.jpg?mode=max&width=2000&height=2000'],
+  },
+  {
+    id: 'prod_003',
+    name: 'Midnight Jacket',
+    price: 1299,
+    images: ['https://www.produits-scandinaves.com/20716-large_default/trondheim-men-sweater-dale-of-norway.jpg'],
+  },
+  {
+    id: 'prod_004',
+    name: 'Fjord Backpack',
+    price: 899,
+    images: ['https://lh6.googleusercontent.com/proxy/rWFDLN3670M0-35y9mUM0AsA0MrU0SXYY5WUiCNQsJK7T09cf_XQsSc3G7tg2SWOC1iqIme2xJ_uAEKcM9M94EFa1vStW2Y8fNyVI7j-3HcXUFZP4HmJuAxEfqSjD38DntkJsUzxORNYpc4sNI1nyQrdM2H6FJFAzNPjED5aa5w_mQaM'],
+  },
+];
 
 export default function GetProducts() {
-  const { data, error, isLoading } = useSWR('/api/products', fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 60000,
-  });
-
-  const products = data?.data || [];
-
   const placeholderCards = Array.from({ length: 8 }).map((_, idx) => (
     <div
       key={idx}
@@ -28,33 +41,28 @@ export default function GetProducts() {
 
   return (
     <div className="w-full py-10">
-      {/* Grid container for heading */}
+      {/* Grid container for heading aligned with product grid */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-6 gap-y-10 px-4 mb-6">
-        <div className="col-span-full px-3 max-w-[600px] mx-auto">
-          <h2 className="text-xl sm:text-2xl md:text-3xl text-gray-700 bg-white/80 py-4 rounded-xl text-left">
-            Produkter
-          </h2>
+        <div className="bg-white/80 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 rounded-xl text-left text-[clamp(1.75rem,3vw,2.5rem)] text-gray-700">
+          Produkter
         </div>
       </div>
 
       {/* Product card grid */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-6 gap-y-10 px-4">
-        {(isLoading ? placeholderCards : products).map((product, index) => (
-          <Link key={product.id || index} href={`/products/${product.id}`} prefetch={false}>
+        {products.map((product, index) => (
+          <Link key={product.id} href={`/products/${product.id}`} prefetch={false}>
             <div
               style={{ animationDelay: `${index * 75}ms` }}
               className="group opacity-0 animate-fadeInUp animation-fill-forwards bg-white/80 rounded-xl overflow-hidden transition-all hover:scale-[1.02] flex flex-col aspect-[9/16]"
             >
               <div className="relative w-full h-full rounded-xl overflow-hidden">
                 <Image
-                  src={product.images?.[0] || '/placeholder.jpg'}
+                  src={product.images[0]}
                   alt="Product preview"
                   fill
-                  priority
-                  quality={60}
-                  loading="eager"
-                  placeholder="blur"
-                  blurDataURL="/blur-placeholder.jpg"
+                  quality={40}
+                  loading="lazy"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: 'cover' }}
                 />

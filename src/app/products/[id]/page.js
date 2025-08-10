@@ -52,7 +52,7 @@ export default async function ProductDetail({ params, searchParams }) {
 
   return (
     <CartWrapper>
-      <div className="min-h-screen bg-neutral-100 flex items-center justify-center px-4 py-12">
+      <div className=" bg-neutral-100 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-screen-xl grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-10 rounded-lg shadow-lg">
           {isEditing ? (
             <PostProduct currentProduct={completeProduct} />
@@ -82,9 +82,9 @@ export default async function ProductDetail({ params, searchParams }) {
                   <CartButton product={completeProduct} />
                   <Link
                     href={`?edit=true`}
-                    className="text-white bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-md text-sm font-medium text-center text-white"
+                    className="productEditButton bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-md text-sm font-medium text-center text-white"
                   >
-                    Edit Product
+                    Edit 
                   </Link>
                 </div>
 
