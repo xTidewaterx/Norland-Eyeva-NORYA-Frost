@@ -42,8 +42,8 @@ export default function GetProducts() {
   return (
     <div className="w-full py-10">
       {/* Grid container for heading aligned with product grid */}
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-2 gap gap-y-10  pb-0 ">
-        <div className="pt-0 mt-0  bg-white/80 px-3 sm:px-4 lg:px-6  sm:py-2  rounded-xl text-left text-[clamp(1.75rem,3vw,2.5rem)] pb-0 mb-0 text-gray-700">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-2 gap gap-y-10  pb-2 ">
+        <div className="pt-0 mt-4  bg-white/80 px-3 sm:px-4 lg:px-6  sm:py-2  rounded-xl text-left text-[clamp(1.75rem,3vw,2.5rem)]  text-gray-700">
           Produkter
         </div>
       </div>
