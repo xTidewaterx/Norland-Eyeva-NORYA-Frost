@@ -4,22 +4,27 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#001f3f] text-white py-8 px-4">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-        {/* Logo Section */}
-        <Link href="/" className="mb-4 md:mb-0 flex items-center space-x-2 group">
+    <footer className="bg-[#001f3f] text-white py-6 px-4 font-sans">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Branding Section */}
+        <Link href="/" className="flex items-center space-x-3 group">
           <img
             src="/norland-logo.png"
-            alt="Norland Logo"
-            className="w-10 h-10 group-hover:invert"
+            alt="NORYA Logo"
+            className="w-8 h-8 group-hover:invert transition duration-300"
           />
-          <span className="text-lg font-semibold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-            Norland
-          </span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-[1.1rem] sm:text-[1.25rem] font-light tracking-wide text-yellow-400 group-hover:text-yellow-300 transition-colors">
+              NORYA
+            </span>
+            <span className="text-xs text-gray-300 tracking-wide">
+              Norwegian quality, from Norway
+            </span>
+          </div>
         </Link>
 
-        {/* Footer Nav */}
-        <div className="flex space-x-6 text-sm font-light text-gray-300">
+        {/* Footer Navigation */}
+        <div className="flex space-x-4 text-sm font-light text-gray-300 tracking-wide">
           <Link href="/about" className="hover:text-yellow-400 transition-colors">Om Oss</Link>
           <Link href="/contact" className="hover:text-yellow-400 transition-colors">Kontakt</Link>
           <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Personvern</Link>
@@ -27,8 +32,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom Strip */}
-      <div className="mt-6 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} Norland. All rights reserved.
+      <div className="mt-6 text-center text-xs text-gray-400 tracking-wide">
+        © {new Date().getFullYear()} NORYA. All rights reserved.
       </div>
     </footer>
   );

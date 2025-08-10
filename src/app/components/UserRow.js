@@ -12,10 +12,19 @@ export default function UserRow() {
     async function fetchUsers() {
       try {
         const snapshot = await getDocs(collection(db, 'users'));
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const data = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(
+            user =>
+              user.photoURL &&
+              user.uid &&
+              user.displayName &&
+              typeof user.photoURL === 'string' &&
+              typeof user.uid === 'string'
+          );
         setUsers(data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -27,12 +36,12 @@ export default function UserRow() {
 
   return (
     <div className="pb-12 md:pb-16 lg:pb-20">
-      <section className="w-full px-6 py-12 mb-12 overflow-x-auto custom-scrollbar">
-        <h2 className="text-3xl mb-10 text-slate-900 tracking-tight leading-tight font-poppins">
+      <section className="w-full py-12 mb-12 overflow-x-auto custom-scrollbar">
+        <h2 className="text-3xl mb-10 text-slate-900 tracking-tight leading-tight font-poppins pl-4">
           Skapere
         </h2>
 
-        <div className="inline-flex gap-6 pb-6">
+        <div className="inline-flex gap-6 pb-6 pl-4">
           {users.map(user => (
             <div
               key={user.id}
@@ -42,11 +51,13 @@ export default function UserRow() {
                 href={`/profile/${user.uid}`}
                 className="transition-transform duration-300 ease-in-out hover:scale-[1.03]"
               >
-                <img
-                  src={user.photoURL}
-                  alt={user.name}
-                  className="w-[50vw] sm:w-[180px] md:w-[220px] lg:w-[260px] h-auto rounded-full object-cover shadow-md hover:ring-1 hover:ring-slate-300 transition-all"
-                />
+                <div className="avatar-wrapper w-[50vw] sm:w-[180px] md:w-[220px] lg:w-[260px] aspect-square overflow-hidden shadow-md hover:ring-1 hover:ring-slate-300 transition-all">
+                  <img
+                    src={user.photoURL}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </Link>
               <h3 className="text-base font-medium text-slate-800 text-center tracking-tight font-poppins">
                 {user.displayName}
@@ -57,7 +68,31 @@ export default function UserRow() {
             </div>
           ))}
         </div>
+
+        {/* SVG Superellipse Definition */}
+<svg width="0" height="0">
+  <defs>
+    <clipPath id="superellipse" clipPathUnits="objectBoundingBox">
+      <path
+        d="
+          M0.5,0
+          C0.85,0,1,0.15,1,0.5
+          C1,0.85,0.85,1,0.5,1
+          C0.15,1,0,0.85,0,0.5
+          C0,0.15,0.15,0,0.5,0
+          Z
+        "
+      />
+    </clipPath>
+  </defs>
+</svg>
       </section>
+
+      <style jsx>{`
+        .avatar-wrapper {
+          clip-path: url(#superellipse);
+        }
+      `}</style>
     </div>
   );
 }
