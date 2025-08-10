@@ -93,16 +93,22 @@ export default function MainBanner() {
           className="object-cover z-0"
         />
 
-     <h2
+<h2
   ref={textRef}
-  className="text-white p-12 text-8xl mb-0 z-10 relative [@media(min-width:2000px)]:text-[10rem]"
+  className="text-white p-12 text-8xl mb-0 z-10 relative [@media(min-width:700px)and(max-width:1270px)]:text-[7rem] [@media(min-width:2000px)]:text-[10rem]"
 >
   NORYA
 </h2>
 
 <div
   ref={revealRef}
-  className="text-white max-w-496 text-3xl sm:text-4xl md:text-3xl lg:text-2xl xl:text-7xl mt-6 text-center p-4 z-20 [@media(min-width:2000px)]:text-[5rem]"
+  className="text-white text-3xl sm:text-4xl  text-center p-4 z-20 md:text-6xl
+             max-w-496
+             min-w-[60vw]
+             [@media(min-width:700px)and(max-width:1270px)]:min-w-[70vw]
+             [@media(min-width:2000px)]:min-w-[50vw]
+             [@media(min-width:700px)and(max-width:1270px)]:text-[3.5rem]
+             [@media(min-width:2000px)]:text-[5rem]"
 >
 </div>
 
