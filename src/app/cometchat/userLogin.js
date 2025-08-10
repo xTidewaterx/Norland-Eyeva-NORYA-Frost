@@ -1,5 +1,6 @@
 import { CometChatUIKit } from "@cometchat/chat-uikit-react";
 
+
 const UID = "cometchat-uid-1"; // Replace with your actual UID
 
 CometChatUIKit.getLoggedinUser().then((user) => {
