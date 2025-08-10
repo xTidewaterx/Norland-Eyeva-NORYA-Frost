@@ -84,7 +84,7 @@ export default async function ProductDetail({ params, searchParams }) {
                     href={`?edit=true`}
                     className="productEditButton bg-gray-800 hover:bg-gray-700 px-6 py-2 rounded-md text-sm font-medium text-center text-white"
                   >
-                    Edit 
+                    Edit Product
                   </Link>
                 </div>
 
