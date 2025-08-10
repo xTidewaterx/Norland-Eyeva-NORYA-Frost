@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { AuthProvider } from './auth/authContext';
 import Navbar from './components/Navbar';
-import MainBanner from './helpers/MainBanner';
-import GetProducts2 from './get/GetProducts2';
+import MainBanner from './components/homePage/banner/MainBanner';
+import GetProducts2 from './components/homePage/get/GetProducts2';
 import UserRow from './components/UserRow'
-import HeroBanner from './components/HeroBanner'
+import HeroBanner from './components/homePage/banner/SecondBanner'
 import Footer from './components/Footer'
 import UserRow2 from './components/UserRow2'
 export default function Home() {
