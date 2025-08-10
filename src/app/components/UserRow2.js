@@ -79,7 +79,7 @@ export default function UserRow2() {
                 href={`/profile/${user.uid}`}
                 className="transition-transform duration-300 ease-in-out hover:scale-[1.03]"
               >
-                <div className="avatar-wrapper w-[50vw] sm:w-[180px] md:w-[220px] lg:w-[260px] aspect-square overflow-hidden shadow-md hover:ring-1 hover:ring-slate-300 transition-all">
+                <div className="avatar-wrapper  min-w-76 w-[50vw] sm:w-[180px] md:w-[220px] lg:w-[400px] aspect-square overflow-hidden shadow-md hover:ring-1 hover:ring-slate-300 transition-all">
                   <img
                     src={user.photoURL}
                     alt={user.displayName}
