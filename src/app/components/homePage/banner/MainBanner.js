@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import {Promises} from "../atoms/Promises"
+import { Promises } from "../atoms/Promises";
 
 export default function MainBanner() {
   const textRef = useRef(null);
@@ -86,7 +86,6 @@ export default function MainBanner() {
     <div className="relative z-10">
       <div className="mainBanner-cover bg-cover bg-center w-full min-h-[40vw] relative flex flex-col items-center justify-center overflow-visible">
         <Image
-        //     src="https://firebasestorage.googleapis.com/v0/b/norland-a7730.appspot.com/o/images%2Focean%20traveller%20v%C3%A5gnes%20troms%C3%B8%20northern%20spirit.jpg?alt=media&token=19828aad-263c-4cf2-9cd4-455253c5a3d7"
           src="https://en.visitbergen.com/imageresizer/?image=%2Fdmsimgs%2F1_Highland_2400x1200_98407125.jpg&action=ProductDetailExtraLargeNew"
           alt="Main Banner"
           fill
@@ -100,14 +99,17 @@ export default function MainBanner() {
         >
           NORYA
         </h2>
+
         <div
           ref={revealRef}
           className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mt-6 text-center p-4 z-20"
-        >      
-        
-</div>
-<div className="z-40"> <Promises/></div>
+        >
+        </div>
 
+        {/* Promises anchored near bottom of banner */}
+        <div className="absolute bottom-6 left-0 right-0 flex justify-center z-40">
+          <Promises />
+        </div>
       </div>
     </div>
   );
