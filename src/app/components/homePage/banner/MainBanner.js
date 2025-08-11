@@ -61,6 +61,10 @@ export default function MainBanner() {
         container.innerHTML = "";
 
         let i = 0;
+        const isMobile = window.innerWidth < 768;
+        const baseSpeed = isMobile ? 30 : 40;
+        const speed = Math.round(baseSpeed * 1.4); // 40% slower
+
         const typingInterval = setInterval(() => {
           if (i < phrase.length) {
             const span = document.createElement("span");
@@ -75,7 +79,7 @@ export default function MainBanner() {
           } else {
             clearInterval(typingInterval);
           }
-        }, 60); // speed per character
+        }, speed);
       }, 1000);
     }, 2000);
 
@@ -93,24 +97,23 @@ export default function MainBanner() {
           className="object-cover z-0"
         />
 
-<h2
-  ref={textRef}
-  className="text-white p-12 text-8xl mb-0 z-10 relative [@media(min-width:700px)and(max-width:1270px)]:text-[7rem] [@media(min-width:2000px)]:text-[10rem]"
->
-  NORYA
-</h2>
+        <h2
+          ref={textRef}
+          className="text-white p-12 text-8xl mb-0 z-10 relative [@media(min-width:700px)and(max-width:1270px)]:text-[7rem] [@media(min-width:2000px)]:text-[10rem]"
+        >
+          NORYA
+        </h2>
 
-<div
-  ref={revealRef}
-  className="text-white text-3xl sm:text-4xl  text-center p-4 z-20 md:text-6xl
-             max-w-496
-             min-w-[60vw]
-             [@media(min-width:700px)and(max-width:1270px)]:min-w-[70vw]
-             [@media(min-width:2000px)]:min-w-[50vw]
-             [@media(min-width:700px)and(max-width:1270px)]:text-[3.5rem]
-             [@media(min-width:2000px)]:text-[5rem]"
->
-</div>
+        <div
+          ref={revealRef}
+          className="text-white text-3xl sm:text-4xl text-center p-4 z-20 md:text-6xl
+                   max-w-496
+                   min-w-[60vw]
+                   [@media(min-width:700px)and(max-width:1270px)]:min-w-[70vw]
+                   [@media(min-width:2000px)]:min-w-[50vw]
+                   [@media(min-width:700px)and(max-width:1270px)]:text-[3.5rem]
+                   [@media(min-width:2000px)]:text-[5rem]"
+        ></div>
 
         {/* Promises anchored near bottom of banner */}
         <div className="absolute bottom-6 left-0 right-0 flex justify-center z-40">

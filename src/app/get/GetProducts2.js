@@ -42,14 +42,14 @@ export default function GetProducts() {
   return (
     <div className="w-full py-10">
       {/* Grid container for heading aligned with product grid */}
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-2 gap gap-y-10  pb-2 ">
-        <div className="pt-0 mt-4  bg-white/80 px-3 sm:px-4 lg:px-6  sm:py-2  rounded-xl text-left text-[clamp(1.75rem,3vw,2.5rem)]  text-gray-700">
+      <div className="max-w-[960px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-2 gap-y-10 pb-2">
+        <div className="pt-0 mt-4 bg-white/80 px-3 sm:px-4 lg:px-6 sm:py-2 rounded-xl text-left text-[clamp(1.75rem,3vw,2.5rem)] text-gray-700">
           Produkter
         </div>
       </div>
 
       {/* Product card grid */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-6 gap-y-10 px-4">
+      <div className="max-w-[960px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-6 gap-y-10 px-4">
         {products.map((product, index) => (
           <Link key={product.id} href={`/products/${product.id}`} prefetch={false}>
             <div
@@ -87,4 +87,3 @@ export default function GetProducts() {
     </div>
   );
 }
-
