@@ -18,7 +18,7 @@ export default function Navbar() {
     if (isHomePage) {
       const timer = setTimeout(() => {
         setShowNorya(true);
-      }, 1000); // Match animation delay
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isHomePage]);
@@ -28,24 +28,23 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           {/* Logo + NORYA */}
-          <Link
-            href="/"
-            className="group flex items-center space-x-2 h-full m-0 pl-2 pr-2 hover:bg-blue-700 hover:invert hover:rounded-b-md transition-all"
-          >
-            <img
-              className="w-8 h-8 group-hover:invert"
-              src="/norland-logo.png"
-              alt="Norland Logo"
-            />
-            {isHomePage && showNorya && (
-              <span
-                id="navbarTextTarget"
-                className="text-2xl pl-1 pt-1 font text-sky-700 group-hover:text-yellow-400 transition-all duration-500 opacity-0 tracking-tight"
-              >
-                NORYA
-              </span>
-            )}
-          </Link>
+<Link href="/" className="group flex items-center h-full m-0 pl-2 pr-2 transition-all hover:bg-yellow-400 hover:rounded-b-md">
+  <div className="flex items-center space-x-2 h-full">
+    <img
+      className="w-8 h-8 transition-all"
+      src="/norland-logo.png"
+      alt="Norland Logo"
+    />
+    {isHomePage && showNorya && (
+      <span
+        id="navbarTextTarget"
+        className="text-2xl pl-1 pt-1 font tracking-tight text-sky-700 transition-all duration-500 opacity-0 group-hover:opacity-100"
+      >
+        NORYA
+      </span>
+    )}
+  </div>
+</Link>
 
           {/* Hamburger Menu (Mobile) */}
           <button
