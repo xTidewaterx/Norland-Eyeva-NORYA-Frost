@@ -54,7 +54,7 @@ export default function ImageCarousel({ images }) {
         ))}
       </div>
 
-      {/* Main Image with left padding */}
+      {/* Main Image with left padding friction */}
       <div className="relative w-full h-full pl-[90px] overflow-hidden rounded-lg shadow-md">
         <Image
           key={images[currentIndex]}
