@@ -8,7 +8,7 @@ import {
   orderBy,
   onSnapshot,
 } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { db } from './firebaseConfigbadCopy';
 
 export function getChatId(uid1, uid2) {
   return [uid1, uid2].sort().join('_'); // consistent chat ID

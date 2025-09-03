@@ -49,7 +49,7 @@ export default function GetProducts() {
       </div>
 
       {/* Product card grid */}
-      <div className="max-w-[960px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-x-6 gap-y-10 px-4">
+      <div className="max-w-[960px] mx-auto grid grid-cols-[repeat(auto-fit, minmax(280px,1fr))] gap-x-6 gap-y-10 px-4">
         {products.map((product, index) => (
           <Link key={product.id} href={`/products/${product.id}`} prefetch={false}>
             <div

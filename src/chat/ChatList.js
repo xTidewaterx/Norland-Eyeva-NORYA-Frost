@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
-import { db, auth } from '../firebase/firebaseConfig';
+import { db, auth } from '../firebase/firebaseConfigbadCopy';
 
 export default function ChatList({ onUserSelect }) {
   const [users, setUsers] = useState([]);

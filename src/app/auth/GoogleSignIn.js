@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { auth, provider } from "../firebaseConfig";
+import { auth, provider } from "../../firebase/firebaseConfig";
 import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import { app } from "../firebaseConfig";
+import { app } from "../../firebase/firebaseConfig";
 
 export function GoogleSignIn() {
   const [user, setUser] = useState(null);
