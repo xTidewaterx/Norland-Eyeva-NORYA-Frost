@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import { app } from "../firebaseConfig";
+import { app } from "../../firebase/firebaseConfig";
+
+import { ResetPassword } from "../../firebase/resetPassword";
 
 export const SignInUser = () => {
   const [authObject, setAuthObject] = useState({
@@ -55,6 +57,13 @@ export const SignInUser = () => {
     }
   };
 
+
+
+
+
+
+
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -91,24 +100,17 @@ export const SignInUser = () => {
                 <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Password
                 </label>
-
-
-         <input
-  name="password"
-  type="password"
-  value={authObject.password}
-  onChange={handleChange}
-  placeholder="Password"
-  minLength={6}
-  required
-  autoComplete="new-password"
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-
-/>
-        
-
-
-
+                <input
+                  name="password"
+                  type="password"
+                  value={authObject.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  minLength={6}
+                  required
+                  autoComplete="new-password"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
               </div>
 
               {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
@@ -121,6 +123,12 @@ export const SignInUser = () => {
                 Sign In
               </button>
             </form>
+
+  
+
+
+   <ResetPassword authObject={authObject} />
+    
           </div>
         </div>
       </div>

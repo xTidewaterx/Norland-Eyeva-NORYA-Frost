@@ -24,7 +24,7 @@ const quicksand = Quicksand({
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { app } from '../firebaseConfig';
+import { app } from '../../firebase/firebaseConfig';
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 const db = getFirestore(app);

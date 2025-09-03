@@ -56,14 +56,14 @@ export default function MainBanner() {
         clone.remove();
 
         // Start typing the follow-up message
-        const phrase = "Handmade Products, by Norwegians, in Norway.";
+        const phrase = "Håndlagde produkter fra Nord-Norge, for deg, fra Nord";
         const container = revealRef.current;
         container.innerHTML = "";
 
         let i = 0;
         const isMobile = window.innerWidth < 768;
         const baseSpeed = isMobile ? 30 : 40;
-        const speed = Math.round(baseSpeed * 1.4); // 40% slower
+        const speed = Math.round(baseSpeed * 1.2); // 40% slower
 
         const typingInterval = setInterval(() => {
           if (i < phrase.length) {
