@@ -8,83 +8,101 @@ export default function MainBanner() {
   const textRef = useRef(null);
   const revealRef = useRef(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const source = textRef.current;
-      const target = document.getElementById("navbarTextTarget");
+useEffect(() => {
+  let outerTimer;
+  let innerTimer;
+  let typingInterval;
 
-      if (!source || !target) return;
+  outerTimer = setTimeout(() => {
+    const source = textRef.current;
+    const target = document.getElementById("navbarTextTarget");
 
-      // Fade out the original text
-      source.style.transition = "opacity 0.3s ease-out";
-      source.style.opacity = "0";
+    if (!source || !target) return;
 
-      // Clone the original and animate it
-      const clone = source.cloneNode(true);
-      const sourceRect = source.getBoundingClientRect();
+    // Fade out the original text
+    source.style.transition = "opacity 0.3s ease-out";
+    source.style.opacity = "0";
 
+    // Clone the original and animate it
+    const clone = source.cloneNode(true);
+    const sourceRect = source.getBoundingClientRect();
+
+    Object.assign(clone.style, {
+      position: "fixed",
+      left: `${sourceRect.left}px`,
+      top: `${sourceRect.top}px`,
+      margin: "0",
+      zIndex: "9999",
+      fontSize: "5rem",
+      fontWeight: "bold",
+      color: "white",
+      transition: "all 1s ease-in-out",
+      transformOrigin: "top left",
+      pointerEvents: "none",
+      whiteSpace: "nowrap",
+    });
+
+    document.body.appendChild(clone);
+
+    const targetRect = target.getBoundingClientRect();
+
+    requestAnimationFrame(() => {
       Object.assign(clone.style, {
-        position: "fixed",
-        left: `${sourceRect.left}px`,
-        top: `${sourceRect.top}px`,
-        margin: "0",
-        zIndex: "9999",
-        fontSize: "5rem",
-        fontWeight: "bold",
-        color: "white",
-        transition: "all 1s ease-in-out",
-        transformOrigin: "top left",
-        pointerEvents: "none",
-        whiteSpace: "nowrap"
+        left: `${targetRect.left}px`,
+        top: `${targetRect.top}px`,
+        opacity: "0.5",
+        transform: "scale(0.6)",
       });
+    });
 
-      document.body.appendChild(clone);
+    // Inner delay
+    innerTimer = setTimeout(() => {
+      target.style.opacity = "1";
+      clone.remove();
 
-      const targetRect = target.getBoundingClientRect();
+      // Start typing the follow-up message
+      const phrase =
+        "Håndlagde produkter fra Nord-Norge, for deg, fra Nord";
+      const container = revealRef.current;
+      if (!container) return; // ✅ safeguard
 
-      requestAnimationFrame(() => {
-        Object.assign(clone.style, {
-          left: `${targetRect.left}px`,
-          top: `${targetRect.top}px`,
-          opacity: "0.5",
-          transform: "scale(0.6)"
-        });
-      });
+      container.innerHTML = "";
 
-      setTimeout(() => {
-        target.style.opacity = "1";
-        clone.remove();
+      let i = 0;
+      const isMobile = window.innerWidth < 768;
+      const baseSpeed = isMobile ? 30 : 40;
+      const speed = Math.round(baseSpeed * 1.2); // slower
 
-        // Start typing the follow-up message
-        const phrase = "Håndlagde produkter fra Nord-Norge, for deg, fra Nord";
-        const container = revealRef.current;
-        container.innerHTML = "";
+      typingInterval = setInterval(() => {
+        if (!container) {
+          clearInterval(typingInterval);
+          return;
+        }
 
-        let i = 0;
-        const isMobile = window.innerWidth < 768;
-        const baseSpeed = isMobile ? 30 : 40;
-        const speed = Math.round(baseSpeed * 1.2); // 40% slower
+        if (i < phrase.length) {
+          const span = document.createElement("span");
+          span.textContent = phrase[i];
+          span.style.opacity = "0";
+          span.style.transition = "opacity 0.3s ease";
+          container.appendChild(span);
+          requestAnimationFrame(() => {
+            span.style.opacity = "1";
+          });
+          i++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, speed);
+    }, 1000);
+  }, 2000);
 
-        const typingInterval = setInterval(() => {
-          if (i < phrase.length) {
-            const span = document.createElement("span");
-            span.textContent = phrase[i];
-            span.style.opacity = "0";
-            span.style.transition = "opacity 0.3s ease";
-            container.appendChild(span);
-            requestAnimationFrame(() => {
-              span.style.opacity = "1";
-            });
-            i++;
-          } else {
-            clearInterval(typingInterval);
-          }
-        }, speed);
-      }, 1000);
-    }, 2000);
+  return () => {
+    if (outerTimer) clearTimeout(outerTimer);
+    if (innerTimer) clearTimeout(innerTimer);
+    if (typingInterval) clearInterval(typingInterval);
+  };
+}, []);
 
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div className="relative z-10">

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { storage } from "../firebaseConfig";
+import { storage } from "../../firebase/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL, deleteObject, getStorage } from "firebase/storage";
 
-import { app } from "../firebaseConfig";
+import { app } from "../../firebase/firebaseConfig";
 
 import { v4 as uuid } from "uuid";
 require("dotenv").config();

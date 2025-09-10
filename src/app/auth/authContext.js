@@ -19,7 +19,7 @@ import {
   getDoc
 } from 'firebase/firestore';
 
-import { app } from '../firebaseConfig'; // ✅ Make sure this path is correct
+import { app } from '../../firebase/firebaseConfig'; // ✅ Make sure this path is correct
 
 const AuthContext = createContext(null);
 
