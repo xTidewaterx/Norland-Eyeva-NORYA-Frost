@@ -18,7 +18,7 @@ import {
   uploadBytes,
   getDownloadURL
 } from "firebase/storage";
-import { app } from "../firebaseConfig";
+import { app } from "../../firebase/firebaseConfig";
 import { getCroppedImg } from "../utils/cropImage";
 import { v4 as uuidv4 } from "uuid";
 import "../globals.css";

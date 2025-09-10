@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { AuthProvider } from './auth/authContext';
 import Navbar from './components/Navbar';
 import MainBanner from './components/homePage/banner/MainBanner';
-import GetProducts2 from './components/homePage/get/GetProducts2';
+import GetProducts from './components/homePage/get/GetProducts';
 import UserRow from './components/UserRow'
 import HeroBanner from './components/homePage/banner/SecondBanner'
 import Footer from './components/Footer'
@@ -20,7 +20,7 @@ export default function Home() {
       {/* <Navbar /> */}
 
       <MainBanner />
-      <GetProducts2 />
+      <GetProducts />
   
 
       {/* Placeholder for your future chat system */}
