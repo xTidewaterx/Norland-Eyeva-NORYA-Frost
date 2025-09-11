@@ -1,50 +1,55 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
+
+
+
+
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-
-
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-
   try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
     if (id) {
       const product = await stripe.products.retrieve(id);
       const price = await stripe.prices.retrieve(product.default_price);
+
       return NextResponse.json({
         ...product,
         price: price.unit_amount / 100,
       });
-    } else {
-      console.log("we are now doing our else condition in route.js, no id, meaning we are getting all stripe products");
-
-      const products = await stripe.products.list({ limit: 4 });
-
-      // Retrieve prices for each product’s default_price
-      const productsWithPrices = await Promise.all(
-        products.data.map(async (product) => {
-          let price = null;
-          if (product.default_price) {
-            const priceData = await stripe.prices.retrieve(product.default_price);
-            price = priceData.unit_amount / 100;
-          }
-          return {
-            ...product,
-            price,
-          };
-        })
-      );
-
-      return NextResponse.json({ data: productsWithPrices });
     }
+
+    console.log('Fetching all Stripe products...');
+
+    const products = await stripe.products.list({ limit: 4 });
+
+    const productsWithPrices = await Promise.all(
+      products.data.map(async (product) => {
+        let price = null;
+        if (product.default_price) {
+          const priceData = await stripe.prices.retrieve(product.default_price);
+          price = priceData.unit_amount / 100;
+        }
+
+        return {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          images: product.images,
+          price,
+        };
+      })
+    );
+
+    return NextResponse.json({ data: productsWithPrices });
   } catch (error) {
+    console.error('Stripe API error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-
 
 
 

@@ -3,9 +3,8 @@
 
 import React from 'react'
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import GetProducts from '../get/getProducts';
+
+import GetProducts from '../components/homePage/get/GetProducts';
 
 export default function GetProductsFunction() {
 
