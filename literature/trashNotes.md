@@ -1,4 +1,47 @@
 
+we just solved a big problem by changing the fetch url, it goes to the next.js route endpoint::
+      const res = await fetch('api/products');
+        const json = await res.json();
+        if (json.data) {
+          setProducts(json.data);
+
+          now we fetch data from our next.js endpoint, it takes our request and it fetches::
+This endpoint is your Next.js API route handler for GET requests, and it’s directly fetching product data from Stripe’s API.
+Exactly 👍 — what you’ve written is a Next.js API route endpoint.
+and that endpoint allows me to request resources through my next server, resrouces from the stripe api?
+ChatGPT said:
+
+Yes ✅ exactly — you’ve nailed it.
+
+That endpoint is acting like a proxy layer:
+
+Your frontend (React components) calls your Next.js API endpoint (/api/products).
+
+That API route runs on your Next.js server.
+
+Inside the handler, you call Stripe’s API with your secret key (safe, because it never touches the browser).
+
+The Next.js server takes Stripe’s response, transforms it (e.g. converting cents → dollars, simplifying fields), and sends it back to your frontend.
+
+
+
+
+
+
+
+
+How Is a Test Structured?
+Testing involves checking if your code is functioning as it's supposed to by comparing the expected output with the actual output.
+
+
+
+
+
+
+
+
+
+
 how can we fix this error:
 FirebaseError: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore
     at ProfilePage (webpack-internal:///(app-pages-browser)/./src/app/profile/[uid]/page.js:110:102)
