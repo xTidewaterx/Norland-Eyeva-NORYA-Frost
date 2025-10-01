@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { storage } from "../../firebase/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL, deleteObject, getStorage } from "firebase/storage";
-
 import { app } from "../../firebase/firebaseConfig";
-
 import { v4 as uuid } from "uuid";
 require("dotenv").config();
 import { useSearchParams } from "next/navigation";
@@ -13,34 +11,9 @@ import { useParams } from "next/navigation";
 
 export default function PostProduct(productValue) {
   const paramsId = useParams().id;
-
-  console.log("Product ID from query params in postProduct.js:", paramsId);
-
   const searchParams = useSearchParams();
   const editParam = searchParams.get("edit");
 
-  const arrayForParams = [
-    { log: "Product ID from query params in postProduct.js:", paramsId },
-    {
-      log: "Product edit status frp, query params in postProduct.js:",
-      editParam,
-    },
-  ];
-
-
-
-
-  console.table(arrayForParams);
-
-  console.log("PostProduct create/edit product url param::", editParam);
-
-  //console.log("PostProduct create/edit product url param::",  productIdFromQuery)
-
-  // Determine edit mode based on query parameter
-
-  //console.log(logAsyncSearchParams)  // Determine edit mode based on query parameter
-
-  // State for product details
   const [product, setProduct] = useState({
     name: productValue ? productValue?.currentProduct?.name : "",
     description: productValue ? productValue?.currentProduct?.description : "",
@@ -57,455 +30,255 @@ export default function PostProduct(productValue) {
     id: "",
   });
 
-  const[deletedProduct, setDeletedProduct] = useState({});
-
-  useEffect(() => {
-    setProduct({ ...product, id: paramsId });
-  }, [paramsId]);
-
-  useEffect(() => {
-    setUpdateProduct({ ...updateProduct, id: paramsId });
-    console.log("postProduct.js updating postProduct.js: id", paramsId);
-  }, [paramsId]);
-
+  const [deletedProduct, setDeletedProduct] = useState({});
+  const [newFiles, setNewFiles] = useState([]); // actual File objects
   const [uploadedUrlsArray, setUploadedUrlsArray] = useState([]);
   const [productId, setProductId] = useState([]);
   const [files, setFiles] = useState([]);
   const [deletedFiles, setDeletedFiles] = useState([]);
-    const [uploadNow, setUploadNow] = useState(false);
+  const [uploadNow, setUploadNow] = useState(false);
 
   useEffect(() => {
+    setProduct({ ...product, id: paramsId });
+    setUpdateProduct({ ...updateProduct, id: paramsId });
+  }, [paramsId]);
 
-console.log("postProduct.js, current deleted files from product object:", deletedFiles)
-  },[deletedFiles])
+  const getStoragePathFromUrl = (url) => {
+    const baseUrl = "https://firebasestorage.googleapis.com/v0/b/norland-a7730.appspot.com/o/";
+    if (url.includes(baseUrl)) {
+      return decodeURIComponent(url.split(baseUrl)[1].split("?")[0]);
+    }
+    return null;
+  };
 
+  const uploadFilesToFirebase = async () => {
+    console.log("Uploading files to Firebase:", files);
 
-  //error:: this is being submitted when it is not supposed to
-  //here we have our stripe upload function that only fires when we have completed our items in our uploadedUrlsArray from firebase
-  
-  //step 5:: complete product object uploaded to stripe including files from firebase are now uploaded to stripe or deleted if requested by client::
-  const uploadFilesToStripe = async () => {
-
-    
-    setUpdateProduct({ ...updateProduct, name: product.name });
-
-    //careful here 500::
-    //if we have not added any new files on this product form session, do not submit any image files to stripe
-    if (files?.length == 0) {
-   //   setProduct({ ...product, images: null });
-      console.log("jaguar");
+    // Delete requested files
+    if (deletedFiles.deletedFiles?.length > 0) {
+      const deletePromises = deletedFiles.deletedFiles.map(async (file) => {
+        try {
+          const imagePath = getStoragePathFromUrl(file.image);
+          if (!imagePath) throw new Error("Invalid Firebase image URL");
+          const imageRef = ref(storage, imagePath);
+          await deleteObject(imageRef);
+          console.log(`Deleted: ${file.image}`);
+        } catch (error) {
+          console.error("Error deleting image:", error);
+        }
+      });
+      await Promise.all(deletePromises);
     }
 
-    console.log(
-      "postProduct.js product form uploadedUrlsArray: ",
-      uploadedUrlsArray
-    );
+    // Upload new files
+    const uploadPromises = files.map(async (file) => {
+      const imageRef = ref(storage, `products/${uuid()}`);
+      try {
+        const snapshot = await uploadBytes(imageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Upload error:", error);
+        return null;
+      }
+    });
 
+    const results = await Promise.all(uploadPromises);
+    const validResults = results.filter((url) => url);
 
+    // Store only in uploadedUrlsArray for Stripe
+    setUploadedUrlsArray(validResults);
 
+    // Update UI preview only (replace blob URLs)
+    setProduct((prev) => ({
+      ...prev,
+      images: [
+        ...prev.images.filter((url) => !url.startsWith("blob:")), // remove preview blobs
+        ...validResults,
+      ],
+    }));
 
+    setFiles([]);
+  };
 
-    console.log(
-      "postproduct editParam right before possible edit:",
-      editParam,
-      "then check if true, triple equals:",
-      editParam === "true"
-    );
-    const endpoint =
-      editParam === "true" ? "/api/products/updateProduct" : "/api/products";
-    console.log("endpoint in postProduct.js:", endpoint);
+  const uploadFilesToStripe = async () => {
+    // Merge existing Firebase URLs + newly uploaded URLs, avoid duplicates
+    const realImages = [
+      ...product.images.filter(
+        (url) => !url.startsWith("blob:") && !uploadedUrlsArray.includes(url)
+      ),
+      ...uploadedUrlsArray,
+    ];
 
-
-      console.log("checking updateProduct image array right before upload postProduct.js: ",updateProduct.images)
+    const endpoint = editParam === "true"
+      ? "/api/products/updateProduct"
+      : "/api/products";
 
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(product),
+      body: JSON.stringify({ ...product, images: realImages }),
     });
+
     const data = await res.json();
-    console.log("postProduct upload data return id: ", data.id);
     setProductId(data.id);
-  }
 
+    // Replace UI images with final URLs after upload
+    setProduct((prev) => ({
+      ...prev,
+      images: realImages,
+    }));
 
+    setUploadedUrlsArray([]);
+  };
 
-
-
-
-
-//step 4:: calling uploadFilesToStripe if we have uploaded new images
   useEffect(() => {
-    //this might become a problem when we want to update something but we dont update any files, then length will stay zero
-
     if (uploadedUrlsArray.length > 0) {
-      console.log(
-        "UploadedUrlsArray length exceeds 0, there are items to upload now"
-      );
-
-     
       uploadFilesToStripe();
-    }
-  }, [uploadedUrlsArray, updateProduct?.images?.length]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  useEffect(() => {
-    if (productValue?.currentProduct && uploadedUrlsArray.length > 0) {
-      console.log(
-        "postProduct.js setting product:",
-        productValue?.currentProduct
-      );
-
-      setProduct(productValue?.currentProduct);
-      
-      //not the culprit of the 0 image product upload:
-    //  setProduct({ ...product, images: uploadedUrlsArray });
     }
   }, [uploadedUrlsArray]);
 
-
-//from here copy ai
-
-  useEffect(() => {
-    console.log(
-      "postProduct.js form upload/edit product, log product:",
-      product
-    );
-  }, [product]);
-
-
-
-  //step 2:: firebase function:: figuring out which files must be uploaded to firebase:
-const uploadFilesToFirebase = async () => {
-  console.log("postProduct.js uploading files to  firebase now, files:", files)
- // if (files.length === 0) return;
- const deleteFiles =async ( ) => {
-
-//we have a problem, when we call this function we have deletedFiles.deletedFiles, but when we then arrive here our deletedFiles are non existent
-
-console.log("inside of postProduct uploadFilestoFirebase function deleteFiles orange: ",deletedFiles)
- console.log("deletedFiles.deleteedFiles postproduct.js orange: ",deletedFiles.deletedFiles)
-
-  // Step 2.1: Delete Images from Firebase (If They Exist)
-  if (deletedFiles?.deletedFiles?.length > 0) {
-    const deletePromises = deletedFiles.deletedFiles.map(async (file) => {
-      try {
-             console.log("logging firebase image path in postproduct.js", file.image)
-        const imagePath = getStoragePathFromUrl(file.image); // Extract storage path
-   
-        if (!imagePath) throw new Error("Invalid Firebase image URL");
-
-        const imageRef = ref(storage, imagePath);
-        await deleteObject(imageRef);
-        console.log(`Deleted: ${file.image}`);
-      } catch (error) {
-        console.error("Error deleting image:", error);
-      }
-    });
-
-   const results= await Promise.all(deletePromises);
-
-   const filteredArray = product.images.filter(value => !deletedFiles.deletedFiles.includes(value));
-
-
-
-   console.log("filteredarray, deleted values removed from product array, new array without deletions:", filteredArray)
-  // const newImages = product.images(())
-  
-
-
-  const validResults = results.filter((url) => url); // Remove null entries
- setUploadNow(true)
-      // Update state with new images
-  setUploadedUrlsArray(...product.images, filteredArray);
-  console.log("postProduct valid results, settings state product image after deletion in firebase, this is the value we are setting as images:", filteredArrays)
-  setUpdateProduct({ ...product, images: filteredArray});
-  setUpdateProduct({ ...product, name: product.name});
-  setProduct({product, images: filteredArray})
-
-  setDeletedProduct({...product, images:filteredArray})
-  //setProduct({ ...product, images: validResults });
-
-  }
-
-
-
-   }
-
-   if(deletedFiles.deletedFiles?.length>0) {
-
-  //console.log("postProduct deleteFiles in uploadStripe function, kicking off backend hopefully, with these files/ images: ", validResults)
-   deleteFiles()
- }
-
-
-   console.log("deletedFiles.deletedFiles postproduct.js:", deletedFiles.deletedFiles)
- 
-
-  // Step 3: Upload the new files from step 2  to Firebase
-  const uploadPromises = files.map(async (file) => {
-    const imageRef = ref(storage, `products/${uuid()}`);
-    try {
-      const snapshot = await uploadBytes(imageRef, file);
-      const url = await getDownloadURL(snapshot.ref);
-      return url;
-    } catch (error) {
-      console.error("Upload error:", error);
-      return null;
-    }
-  });
-
-  const results = await Promise.all(uploadPromises);
-  const validResults = results.filter((url) => url); // Remove null entries
-//const productImages= product.images((productImages) => productImages)
-  // Update state with new images
-  setUploadedUrlsArray(validResults);
-  //setUpdateProduct({...product, images: validResults})
-  setUpdateProduct({ ...product, images: validResults });
-  setProduct({...product, images: validResults})
- 
-
-  
-
-if(editParam) {
-
-
-
-  const currentStripeProductImages = product?.images.map((productFiles)=> productFiles);
-
-  console.log("currentStripeproductimages, current product files before new uploads: ",currentStripeProductImages)
-
-  const newStripeProductImages = validResults.map((productFiles) => productFiles)
-console.log("newStripeproduct images: from uploads to firebase:",newStripeProductImages)
-
-
-  console.log("attempt at combined images array postProduct.js right before upload:", {images: [...currentStripeProductImages,...newStripeProductImages ]})
-
-   setProduct({ ...product, images: [...currentStripeProductImages,...newStripeProductImages ] });
-
-
-}
-
-};
-
-// Helper function to extract storage path from Firebase URL
-const getStoragePathFromUrl = (url) => {
-  const baseUrl = "https://firebasestorage.googleapis.com/v0/b/norland-a7730.appspot.com/o/";
-  if (url.includes(baseUrl)) {
-    return decodeURIComponent(url.split(baseUrl)[1].split("?")[0]);
-  }
-  return null; // Invalid Firebase URL
-};
-
-  //console.log(files, "files length in postProduct.js:",  files?.length)
-
-
-  useEffect(()=> {
-
-  //when we submit we want these deleted files to be removed from firebase, and in effect, stripe also
-  //so on submit, also request an endpoint to delete firebase files
-    console.log("postProduct.js deleted files: ", deletedFiles)
-
-//do file deletion on frontend
-
-
-
-  }, [deletedFiles.length]);
-
-
-
-  //important!!
-  //step 1: checking what databases APIs we must request
-  // here we fire off our uploadFilesToFireBase function if (there are files in the (new)files array or if there are deleted files in the deleted files array)
-  // else we do this: (if firebase is not needed for big file changes) this function will upload product directly to STripe
-   //OR:: it will 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-       console.log(files, "files length for deleted files in postProduct.js:", deletedFiles.deletedFiles?.length);
-
-
-    if (files?.length != 0  || deletedFiles?.deletedFiles?.length>0) {
-      console.log(files, "files length for new files in postProduct.js:", files?.length);
-           console.log(files, "files length for deleted Files in postProduct.js:", deletedFiles.deletedFiles?.length);
-
-
+    if (files?.length !== 0 || deletedFiles?.deletedFiles?.length > 0) {
       await uploadFilesToFirebase();
     } else {
-      console.log("directly uploading to stripe, because there are no big file edits requiring firebase:");
-
       uploadFilesToStripe();
     }
   };
 
   const onChange = (e) => {
     if (e.target.files) {
-      console.log("postProduct files added:", e.target.files);
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(e.target.files)]);
+      const selectedFiles = Array.from(e.target.files);
+      setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+
+      const previewUrls = selectedFiles.map((file) => URL.createObjectURL(file));
+      setProduct((prev) => ({
+        ...prev,
+        images: [...prev.images, ...previewUrls],
+      }));
     }
   };
- 
- 
- 
-  //step 1: this function stop stop stop
 
+  const removeImage = ({ image, index }) => {
+    setDeletedFiles((prevFiles) => {
+      const deletedFilesArray = prevFiles?.deletedFiles ?? [];
+      return {
+        ...prevFiles,
+        deletedFiles: [...deletedFilesArray, { image }],
+      };
+    });
 
-
-
-  // Remove an image from the product's images array
-  const removeImage = ({image,index}) => {
-
-
-
-
-  setDeletedFiles((prevFiles) => {
-    // Ensure prevFiles exists and `deletedFiles` is an array
-    const deletedFilesArray = prevFiles?.deletedFiles ?? [];
-
-    console.log("postProduct deleted files array:",deletedFilesArray)
-
-    return {
-      ...prevFiles,
-      deletedFiles: [...deletedFilesArray, { image }],
-    };
-  });
-
-
-
-
-
-
-  
-  console.log(deletedFiles)
     setProduct((prevProduct) => ({
       ...prevProduct,
       images: prevProduct.images.filter((_, i) => i !== index),
     }));
+
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  useEffect(() => {
-    console.log(
-      "component postProduct.js, product state object was just edited: ",
-      product
-    );
-  }, [product]);
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-3xl w-full mx-auto bg-white p-8 rounded-xl shadow-md"
+    >
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        {productValue?.currentProduct ? "Edit Product" : "Add New Product"}
+      </h2>
 
-
-
-return (
-  <form
-    onSubmit={handleSubmit}
-    className="max-w-3xl w-full mx-auto bg-white p-8 rounded-xl shadow-md"
-  >
-    <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-      {productValue?.currentProduct ? "Edit Product" : "Add New Product"}
-    </h2>
-
-    <div className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Product Name
-        </label>
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter product name"
-          value={product.name}
-          onChange={(e) => setProduct({ ...product, name: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description
-        </label>
-        <textarea
-          name="description"
-          placeholder="Write a short description"
-          value={product.description}
-          onChange={(e) =>
-            setProduct({ ...product, description: e.target.value })
-          }
-          rows={4}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Price
-        </label>
-        <input
-          type="text"
-          name="price"
-          placeholder="e.g. 199.99"
-          value={product.price}
-          onChange={(e) => setProduct({ ...product, price: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Upload Images
-        </label>
-        <input
-          type="file"
-          name="image"
-          onChange={onChange}
-          multiple
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <h3 className="text-md font-medium text-gray-800 mb-2">
-          Product Images
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 border border-gray-200 rounded-lg p-4 max-h-[400px] overflow-y-auto">
-          {product?.images?.map((image, index) => (
-            <div key={index} className="relative">
-              <img
-                src={image}
-                alt={`Product ${index}`}
-                className="w-full h-48 object-cover rounded-lg shadow-sm"
-              />
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  removeImage({ image, index });
-                }}
-                className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow"
-              >
-                ✖
-              </button>
-            </div>
-          ))}
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Product Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter product name"
+            value={product.name}
+            onChange={(e) => setProduct({ ...product, name: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      </div>
 
-      <button
-        type="submit"
-        className="w-full py-3 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 transition duration-300"
-      >
-        {productValue?.currentProduct ? "Update Product" : "Add Product"}
-      </button>
-    </div>
-  </form>
-);
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <textarea
+            name="description"
+            placeholder="Write a short description"
+            value={product.description}
+            onChange={(e) =>
+              setProduct({ ...product, description: e.target.value })
+            }
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Price
+          </label>
+          <input
+            type="text"
+            name="price"
+            placeholder="e.g. 199.99"
+            value={product.price}
+            onChange={(e) => setProduct({ ...product, price: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Upload Images
+          </label>
+          <input
+            type="file"
+            name="image"
+            onChange={onChange}
+            multiple
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <h3 className="text-md font-medium text-gray-800 mb-2">
+            Product Images
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 border border-gray-200 rounded-lg p-4 max-h-[400px] overflow-y-auto">
+            {product?.images?.map((image, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={image}
+                  alt={`Product ${index}`}
+                  className="w-full h-48 object-cover rounded-lg shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeImage({ image, index });
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow"
+                >
+                  ✖
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 transition duration-300"
+        >
+          {productValue?.currentProduct ? "Update Product" : "Add Product"}
+        </button>
+      </div>
+    </form>
+  );
 }

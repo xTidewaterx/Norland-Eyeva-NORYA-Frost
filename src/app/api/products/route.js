@@ -54,6 +54,10 @@ export async function GET(req) {
 
 
 
+
+
+
+
 //this is our upload new product code, on our postProduct new product, this is the code on our next.js post endpoint route
 export async function POST(req) {
     try {

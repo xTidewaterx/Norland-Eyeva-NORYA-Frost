@@ -1,4 +1,34 @@
 
+when we load our homepage we have one image that is not loading, why
+thoughts::
+file too big
+
+not sharable image?
+maybe image was uploaded before we changed
+
+
+
+note:: when you edit product, have the added image be showing in the preview
+
+add a current image upload to whatever array you are acessing for it
+
+fixed the problem
+
+
+
+now check that payments are insanely secure 
+
+
+
+
+
+
+
+
+
+
+
+
 we just solved a big problem by changing the fetch url, it goes to the next.js route endpoint::
       const res = await fetch('api/products');
         const json = await res.json();

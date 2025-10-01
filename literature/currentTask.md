@@ -1,4 +1,24 @@
 
+question:: does our product object include everything necessary for the stripe product object, so the object can be uysed for a chec kout session and be payed for
+https://docs.stripe.com/api/checkout/sessions/object
+https://docs.stripe.com/api/checkout/sessions/object
+
+https://docs.stripe.com/api/checkout/sessions/object#checkout_session_object-line_items
+
+
+To create a Stripe Product object, the most crucial and required attribute is the name. You must also include a price object for the product, either by adding it to the Dashboard or defining default_price_data when using the API. Other optional but highly recommended fields include a description, images, a tax code, and metadata. 
+Required Attributes
+Name: A string representing the name of your product, which will be displayed to customers. 
+Price: When creating a product, it must have at least one associated price. You can create a price in the Dashboard or define default_price_data when creating the product via the API. 
+Recommended Optional Attributes
+Description: A description of the product that appears to customers on the checkout page, in quotes, and in the customer portal. 
+
+stripe object price and name 
+
+conclusion to the product object neccessities question:: we must have price and name.
+
+make a simple product that can be sold, then add on later, we dont want to create a mess to get out of, we get knowledge, for now, have it simple and functional
+
 
 
 How to create favourite products for users in firebase:
