@@ -1,4 +1,21 @@
 
+
+we can have complicated tasks, but stop and think, what will be the origin, think in the smallest pieace of code,
+javascript is single threaded, things happen one teask at once, think of one specific thing, very specific. With our upload component, it was specifically the firebase upload that went wrong, or wrong? it uploaded twice, so we must figure out, where are we supplying images, are we sending duplicate images to our endpoint or is the endpoint uploading one specific image action twice on each endpoint request? the endpoint does probably not choose one specific image and upload it twice on each, it is more likely that the endpoint does exactly what it is supposed to do, and has done, at least we have our newest, edited addition image uplaoded twice, what is the process? maybe our preview addition created another way of adding a url, so now we have multiple images being added, although it is the same, from both the prview array and the product array?? at least, to debug, limit possibilities, find the tiny area where it all begins, limit, we know we upload images to firebase, we know it takes images from an array
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 1:: DEV SERVER = occupied terminal
 when i run npm run dev,  and i run a dev server, the terminal is now occupied by the running server, means i have to open a new terminal to write commands
 
