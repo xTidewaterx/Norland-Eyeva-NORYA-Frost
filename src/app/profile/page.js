@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-const ChatUI = dynamic(() => import('../components/ChatUI'), { ssr: false });
 
 import React, { useState, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';

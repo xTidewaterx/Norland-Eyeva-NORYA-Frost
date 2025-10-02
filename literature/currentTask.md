@@ -1,3 +1,118 @@
+we learned today::
+we use promise, that we await a result, we await all on the map methodm so we have upload files to firebaase and await the URLs, we then have avalidresults array that we then set for our state wehn it is copmlete. we await promise.all(uploadPormises)
+
+
+    const uploadPromises = files.map(async (file) => {
+      const imageRef = ref(storage, `products/${uuid()}`);
+      try {
+        const snapshot = await uploadBytes(imageRef, file);
+        const url = await getDownloadURL(snapshot.ref);
+        return url;
+      } catch (error) {
+        console.error("Upload error:", error);
+        return null;
+      }
+    });
+
+    const results = await Promise.all(uploadPromises);
+
+
+    await all
+
+    The map() method of Array instances creates a new array populated with the results of calling a provided function on every element in the calling array.
+
+
+
+what is happening, we click to check out a singular product, with image URLs and details in the product object, but we cannot previe our edit product object, we have a rpoblem with firebase
+
+
+
+
+
+ our current problem:
+ firebase permissions and upstream problem::
+
+ quota has been exceeded, we have exceeed qota::
+ conclusion::
+ ask AI to fix this::
+ make it so that when we deleted images they are certainly gone, and no previews of deleted images, dleted them from all arrays
+ ALSO::
+ make sure that Firebase URLs and newly added file upload file URLs are dispalyed equally
+ ::mAKE SURE THAT You have a preview of the product object as it will be uploaded, with the newly added images in the preview together with the files that were there before clicking edit event
+
+
+
+
+
+
+
+i have now checked current user, i have added so that ican log the important values, i now have creator id and creator name
+
+Yes ✅
+
+If you’ve wrapped a component tree in a Context Provider, then any child component inside that tree can use the context with useContext (or in your case useAuth()).
+
+For example:
+
+// authContext.js
+import { createContext, useContext, useState } from "react";
+
+const AuthContext = createContext();
+
+
+
+we have context wrapped other ocmponents, then tree context provider contgext tree,
+then we have so that our edit component has values, it checks for current values otherwise empty because then empty
+
+product setstate
+i added current context value, we have a custom hook, we wrapt our component in context
+
+2:: sjekk at produkter lastes opp, muligens legg til noen felt, make sure current user context value is the value added to the product, can we do it through metadata
+what to do: check fodler post, postProduct
+1:: are we logging current user value when we click edit product? check our PostProduct component  (extra:: started deleting a bunch of unesessary code, like cometchat, a different chat provider, we can just use firebase with subcollections)
+
+extra:: problems finding productDetail page code, sort it better
+
+sort it better
+
+
+products detail apge is in  src app  products id page.js, there we have our:
+import postproduct, we do our postproduct when we do our editing
+
+
+
+
+
+
+
+
+ current task, 1:: fixing stripe account so it can recieve payments, adding vat and iban number, organisasjonsnummer og iban nummer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 question:: does our product object include everything necessary for the stripe product object, so the object can be uysed for a chec kout session and be payed for
 https://docs.stripe.com/api/checkout/sessions/object

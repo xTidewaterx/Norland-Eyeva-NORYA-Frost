@@ -143,6 +143,10 @@ export default function PostProduct(productValue) {
 
     if (files?.length !== 0 || deletedFiles?.deletedFiles?.length > 0) {
       await uploadFilesToFirebase();
+      // 🔥 ensure Stripe is updated even if only deletions happened
+      if (files?.length === 0 && deletedFiles?.deletedFiles?.length > 0) {
+        await uploadFilesToStripe();
+      }
     } else {
       uploadFilesToStripe();
     }

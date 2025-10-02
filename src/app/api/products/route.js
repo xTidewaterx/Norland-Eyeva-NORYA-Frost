@@ -66,6 +66,7 @@ export async function POST(req) {
         if (!name || !price) {
             return NextResponse.json({ error: "Product name and price are required" }, { status: 400 });
         }
+        console.log("Creating product, testing:", { name, description, price, images });
 
         // Step 1: Create the product in Stripe
         const product = await stripe.products.create({

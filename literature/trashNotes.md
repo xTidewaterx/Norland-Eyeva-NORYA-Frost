@@ -1,4 +1,124 @@
 
+we ifex so we delete images on both firebase and stripe, even when our only action is deleting one image, meaning we dont need to have an array with new uploads to fire the stripe function, we now have an edit component that   is flexible and responds to the crud operations, both single and multiple
+
+
+we fixed our problem and made it possible, by understanding
+that stripe uploading the newest object available on the click upload event. So we just deleted images and clicked upload, because we know it will rewrite the stripe object::
+
+        // Step 1: Create the product in Stripe
+        const product = await stripe.products.create({
+            name,
+            description: description || "", // Default empty description if none provided
+          images: images,
+            default_price_data: {
+                unit_amount: price,
+                currency: 'usd',
+        
+              },
+
+        });
+
+
+conclusion:: 
+we fixed the product preview, and we made it so that when we delete something it actually dissapeared, and we added an image, we did CRUD operations to test the flexibility of it
+
+
+
+current problem::
+if we only delete, it does not work, perhaps it does not update the product object appropriately
+
+the problem is:: when we delete something., it appears we are not also uploading a new stripe 
+object,
+we stayed calm, we fixed so that even when no image file uploads are added, and we dont have an array with extra items, we still go thourgh with stripe upload, we must overwrite our stripe object
+
+
+
+
+
+
+
+
+|1:: problem with previews on productDetail page, we are seeing previews of images deleted from firebase, perhaps stripe product object har URLs for images that are deleted in firebase
+
+we have our previews, for some reason our  blob is adding images that are nowhere to be found
+
+is the problem that we have url in our stripe product, but not in our firebase
+
+log our stripe product
+
+
+how can we log our stripe product
+we have a dynamic route
+where is our 
+
+here it is:
+
+async function getProduct(id) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products?id=${id}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+question: how could we find our source of our image and previews, it is our product object
+find our product object
+
+
+
+question
+      // Step 1: Create the product in Stripe
+        const product = await stripe.products.create({
+            name,
+            description: description || "", // Default empty description if none provided
+          images: images,
+            default_price_data: {
+                unit_amount: price,
+                currency: 'usd',
+        
+              },
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+currently:: fixing payments through my account, iban number
+
+
+
+
+
+
+when you upload a product, it should check for adding a creator,
+for example the current user
+
+
+
+
+
+
+
+
+
+
+
+
 when we load our homepage we have one image that is not loading, why
 thoughts::
 file too big
