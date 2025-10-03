@@ -17,6 +17,16 @@ well, any code writte on the frontend to fetch from firebase could have bee writ
 into our backend::
 Frontend vs Backend with Firebase
 
+happy upload to database, await:: 
+ The await operator is used to wait for a Promise and get its fulfillment value. It can only be used inside an async function or at the top level of a module.
+await expression
+Parameters
+expression
+A Promise, a thenable object, or any value to wait for.
+
+we wait for a value, await
+
+
 Frontend (client SDK)
 
 Any code running here is visible to the user.
