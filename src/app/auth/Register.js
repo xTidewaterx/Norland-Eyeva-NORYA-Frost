@@ -109,6 +109,8 @@ export const RegisterUser = () => {
     }
   };
 
+  //Asynchronous code lets a program start a task and continue running without waiting for that task to finish, improving efficiency and responsiveness.
+ //await is what you use inside asynchronous code to pause execution until a promise (or async task) is finished, without blocking the rest of the program.
   return (
     <section className="bg-[#F0F4F8] dark:bg-[#001A4A] min-h-screen flex flex-col items-center justify-start px-4 py-10 space-y-6">
       <div className="w-full max-w-md bg-white dark:bg-[#00205B] rounded-lg shadow-lg p-6 space-y-6">
