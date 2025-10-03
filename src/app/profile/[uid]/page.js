@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { auth, db } from '../../firebaseConfig';
+
+import {auth, db} from '../../../firebase/firebaseConfig';
+
 import {
   collection,
   query,
@@ -11,7 +13,7 @@ import {
   doc,
   getDoc,
   serverTimestamp,
-} from 'firebase/firestore';
+} from '../../../firebase/firebaseConfig';
 import ChatWindow from '../../../chat/ChatWindow';
 
 export default function ProfilePage() {

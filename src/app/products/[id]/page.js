@@ -4,8 +4,10 @@ import Link from "next/link";
 
 import CartWrapper from "../../../app/utils/cartWrapper";
 import CartButton from "../../../app/utils/cartButton";
-import PostProduct from "../../../app/post/postProduct";
+import PostProduct from "../../post/PostProduct";
+
 import ImageCarousel from "../../components/productDetailPage/ImageCarousel"// Adjust path if needed
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 

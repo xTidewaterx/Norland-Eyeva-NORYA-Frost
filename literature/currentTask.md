@@ -1,3 +1,133 @@
+
+24:: fix users so there is a public collection of users, and a private one. things to do: make profile pic, user tag and username public, :: make sure this is added at the right locations, so uploading new public intel, must update both private and public collection with correct documents
+24.1:: when we create users this must happen::
+24,2 we also fixed the upload product component to accept the no data starting point when adding new products contrary to when you are editing an existing producti n stripe and firebase
+24:: conclusion:: we now have a user tag created, we have two user collections in our firebase database. we have fixed both the create product component in post postproduct.js and the register component in auth register.js  .. :: we now have a creation of two collections on user creation. we have an endpoint that: is a post endpoint that recieves a request, and
+then it takes the request, it does await admin.auth and creatuser
+
+then it teakes userdata and upload to both collections the correct data::
+![alt text](image-1.png)
+
+    // Save in both collections
+    await db.collection("users").doc(userRecord.uid).set(userData);
+    await db.collection("publicUsers").doc(userRecord.uid).set(userData);
+
+    return NextResponse.json({ success: true, uid: userRecord.uid, userTag });
+  } catch (err) {
+
+
+
+
+23:: How to create a users collection that is safe to share with the public:
+
+Create a separate collection in Firebase called publicUsers. This collection should only store non-sensitive information about each user (for example: username, avatarUrl, bio, or a unique tag).
+
+By keeping only safe fields in this collection, we can fetch data from it in our UserRow component and use it in our Next.js routes. This allows our backend endpoint to return non-sensitive user information securely.
+
+We can also use the unique tag stored in each publicUsers document to look up specific users (e.g. a seller profile) and then connect this with our chats collection to enable conversations between users.
+
+
+
+
+how to keep url query parameter safe when visiting user profile, so we have unique tag to eestablish chat with sellers in their subcollection: 
+
+So your flow would be:
+
+User picks a username for display (not unique).
+
+System generates or requires a unique tag (enforced in Firestore) — this is what goes in the URL.
+
+/profile/@johan92
+
+
+Your Next.js route takes the tag from the URL, fetches the corresponding uid from publicUsers, and uses that internally to:
+
+Show profile info
+
+Create chats (participants: [buyerUid, sellerUid])
+
+This way, the URL is human-friendly and safe, and you avoid collisions that would happen if you used the plain username.
+
+If you want, I can outline how to enforce unique tags and generate them when users sign up.
+
+
+23.1:: establish a firebase  subcollection in the database of only one chat between different user pairs::
+so then we can use that unique tag to establish a subcollection that saves chats between that user and other users
+ChatGPT said:
+
+Exactly ✅ — that’s a safe and clean way to structure it. Let me break it down clearly:
+
+1. Use the unique tag to find the user
+
+URL: /profile/@johan92
+
+Next.js backend or API route reads @johan92 → looks up publicUsers → gets the uid
+
+2. Create a chat between users
+
+Use the uid internally (never the tag) for Firestore writes.
+
+Example chats collection structure:
+
+/chats/{chatId}
+   participants: [buyerUid, sellerUid]
+   createdAt: timestamp
+
+   /messages/{messageId}
+      text: "Hello"
+      senderUid: buyerUid
+      createdAt: timestamp
+
+
+chatId can be auto-generated or deterministic (like hashing buyerUid + sellerUid) if you want only one chat per pair.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22:: 1. thrusday: we made it so the placeholder cards before the real firebase cards match what is incoming, 2: we made it so when you click to submit form with form submit function event we now navigate to the product url without the query parameter called edit, we have a url that hints to our code what should happen with our state, we can get a global state with our usecontext hook 
+Yes ✅
+
+useContext is a React hook.
+3: important lesson: our PostProduct component is in t he post folder, in src folder inside app folder, conclusion::
+we have many functions, they all respond to each other, like callbacks, we can await the result of a promise, and then we fire the next function
+Yes ✅ — a function can await a response from an endpoint even if that endpoint is the result of a successful database create (POST) request.
+
+we can await a response from an endpoint that should upload something to our database for us
+
+
+
+
+
+
+
+
+
+
+
+
 we learned today::
 we use promise, that we await a result, we await all on the map methodm so we have upload files to firebaase and await the URLs, we then have avalidresults array that we then set for our state wehn it is copmlete. we await promise.all(uploadPormises)
 

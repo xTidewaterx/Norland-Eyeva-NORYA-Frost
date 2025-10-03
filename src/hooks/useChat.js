@@ -15,7 +15,7 @@ import {
 
 
 
-import { db } from '../app/firebaseConfig';
+import { db } from '../firebase/firebaseConfig';
 
 export function useChat(chatId, currentUserId) {
   const [messages, setMessages] = useState([]);

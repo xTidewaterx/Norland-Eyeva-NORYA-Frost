@@ -28,13 +28,13 @@ const firebaseConfig = {
  
 
  const app = initializeApp(firebaseConfig);
- export const auth = getAuth(app);
- const provider = new GoogleAuthProvider();
- const storage = getStorage(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+const storage = getStorage(app);
+const db = getFirestore(app);
 
  
- export {provider, signInWithRedirect, getRedirectResult, storage, app, ref, listAll, getDownloadURL };
+ export {provider, signInWithRedirect, getRedirectResult, storage, app,db, ref, listAll, getDownloadURL, auth};
  
 
 // Prevent Analytics from running on the server

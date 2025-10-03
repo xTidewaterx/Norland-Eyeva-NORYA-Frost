@@ -1,3 +1,59 @@
+23:: transfer/merge properties from the user objects in the users collection in the firebase database into another collection, a public users collection, we did use:     await Promise.all(promises);
+we awaited all of the transfers to happen, then we had object with a select amount of proeprties copied from our private yusers collection, the orginal users collection
+
+23.1:: we are changing rules for our different collections in firebase, to allow read and write, we are communicating with an endpoint aht allows this touch with the resources
+what did we learn, 23::
+we created an api folder and a rout.js, in that endpoint we:
+
+
+in our frontend component we fetched from the endpoint,
+no actually, there were si nmany permission boundaries
+we jsut did it all on our frontend.
+but it is a bit risky
+we must do it 
+on our backend endpoint instead. 
+how could we do it with our endpoint:
+well, any code writte on the frontend to fetch from firebase could have bee written
+into our backend::
+Frontend vs Backend with Firebase
+
+Frontend (client SDK)
+
+Any code running here is visible to the user.
+
+Anyone can inspect the network requests or your JS and try to call Firebase directly.
+
+If your Firestore security rules aren’t strict, this can be abused.
+
+Risk: users could write/modify data they shouldn’t if rules aren’t tight.
+
+Backend (server API + Firebase Admin SDK)
+
+Code runs on your server (Next.js API routes, for example).
+
+Admin SDK bypasses Firestore rules because your server is trusted.
+
+Users can’t see or modify your API implementation.
+
+You can implement custom validation before writing to Firestore.
+
+Benefit: much safer; hard for hackers to manipulate.
+
+
+conclusion::
+our backend is harder to reach, not visible to users, on our forntend, anyone can inspect the network requests on your js and try to call firebase directly
+there is a risk that users can write / modify data they shouldn't
+
+backend is much safer, server api + firebase admin sdk
+code runs on server, users can't see or modify your api implementation::
+A program implements an API when it follows the API's rules. In our pizza parlor example, a client that can make requests to the /orders endpoint using the correct headers and data format would be a client that implements the pizza parlor's AP
+
+
+
+
+
+
+
 
 we ifex so we delete images on both firebase and stripe, even when our only action is deleting one image, meaning we dont need to have an array with new uploads to fire the stripe function, we now have an edit component that   is flexible and responds to the crud operations, both single and multiple
 

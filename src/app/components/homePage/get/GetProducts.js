@@ -61,13 +61,14 @@ export default function GetProducts() {
     fetchProducts();
   }, []);
 
-  const placeholderCards = Array.from({ length: 8 }).map((_, idx) => (
-    <div
-      key={idx}
-      style={{ animationDelay: `${idx * 75}ms` }}
-      className="bg-gray-200 animate-pulse rounded-xl flex flex-col aspect-[9/16] w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[500px] xl:max-w-[600px] opacity-0 animate-fadeInUp animation-fill-forwards"
-    />
-  ));
+const placeholderCards = Array.from({ length: 4 }).map((_, idx) => (
+  <div
+    key={idx}
+    style={{ animationDelay: `${idx * 75}ms` }}
+    className="group animate-fadeInUp animation-fill-forwards bg-gray-100 rounded-xl overflow-hidden flex flex-col aspect-[9/16]"
+  />
+));
+
 
   return (
     <div className="w-full py-10">

@@ -2,29 +2,13 @@
 
 import { useState } from "react";
 import Cropper from "react-easy-crop";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import {
-  getFirestore,
-  doc,
-  setDoc
-} from "firebase/firestore";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { app } from "../../firebase/firebaseConfig";
 import { getCroppedImg } from "../utils/cropImage";
 import { v4 as uuidv4 } from "uuid";
 import "../globals.css";
 import { GoogleSignIn } from "./GoogleSignIn";
 
-// 👤 Default fallback image
 const DEFAULT_AVATAR_URL =
   "https://firebasestorage.googleapis.com/v0/b/norland-a7730.appspot.com/o/profile%2FA%20rectangular%20default%20profile%20edit.png?alt=media&token=f00d3c5c-4d54-4af8-8f89-dba56cefb708";
 
@@ -36,7 +20,6 @@ export const RegisterUser = () => {
     fullName: "",
     phone: "",
   });
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [imageSrc, setImageSrc] = useState(null);
@@ -82,10 +65,7 @@ export const RegisterUser = () => {
     }
   };
 
-  const createUserWithEmailAndPasswordFunction = async () => {
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+  const handleRegister = async () => {
     const { email, password, confirmPassword, fullName, phone } = authObject;
 
     if (password !== confirmPassword) {
@@ -93,43 +73,38 @@ export const RegisterUser = () => {
       return;
     }
 
+    let photoURL = DEFAULT_AVATAR_URL;
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      let profileImageUrl = DEFAULT_AVATAR_URL;
-
+      // Upload cropped avatar if exists
       if (croppedImage) {
         const blob = await (await fetch(croppedImage)).blob();
-        const imageRef = ref(storage, `profilePics/${user.uid}/${uuidv4()}.jpeg`);
+        const storage = getStorage(app);
+        const imageRef = ref(storage, `profilePics/${uuidv4()}.jpeg`);
         await uploadBytes(imageRef, blob);
-        profileImageUrl = await getDownloadURL(imageRef);
+        photoURL = await getDownloadURL(imageRef);
       }
 
-      // 🔁 Update Firebase Auth profile directly
-      await updateProfile(user, {
-        photoURL: profileImageUrl,
-        displayName: fullName,
+      // Call backend API to create user safely
+      const res = await fetch("/api/registerUser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, fullName, phone, photoURL }),
       });
 
-      // 💾 Store profile info in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email,
-        fullName,
-        displayName: fullName,
-        phone,
-        photoURL: profileImageUrl,
-        createdAt: new Date(),
-      });
+      const data = await res.json();
 
-      setSuccess(`Welcome, ${fullName || user.email}`);
-      setError("");
-      console.log("✅ Registered:", user.email);
+      if (data.success) {
+        setSuccess(`Account created! Your user tag is ${data.userTag}`);
+        setError("");
+      } else {
+        setError(data.error || "Failed to create account");
+        setSuccess("");
+      }
     } catch (err) {
-      setError(err.message);
+      console.error("Frontend error:", err);
+      setError("Something went wrong");
       setSuccess("");
-      console.error("❌ Error:", err.message);
     }
   };
 
@@ -140,15 +115,9 @@ export const RegisterUser = () => {
           {croppedImage ? (
             <img src={croppedImage} className="w-24 h-24 rounded-full object-cover mx-auto" />
           ) : (
-            <img
-              src={DEFAULT_AVATAR_URL}
-              className="w-12 h-12 rounded-full object-cover mx-auto"
-              alt="Default Avatar"
-            />
+            <img src={DEFAULT_AVATAR_URL} className="w-12 h-12 rounded-full object-cover mx-auto" alt="Default Avatar" />
           )}
-          <h1 className="text-2xl font-bold mt-2 text-[#00205B] dark:text-[#FFD100]">
-            Create an account
-          </h1>
+          <h1 className="text-2xl font-bold mt-2 text-[#00205B] dark:text-[#FFD100]">Create an account</h1>
         </div>
 
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
@@ -156,40 +125,17 @@ export const RegisterUser = () => {
 
         <form className="space-y-4">
           <div className="flex flex-col items-center">
-            <label
-              htmlFor="profile-pic"
-              className="cursor-pointer px-4 py-2 border border-[#FFD100] text-[#00205B] dark:text-[#FFD100] rounded-md hover:bg-[#00205B] hover:text-white transition"
-            >
+            <label htmlFor="profile-pic" className="cursor-pointer px-4 py-2 border border-[#FFD100] text-[#00205B] dark:text-[#FFD100] rounded-md hover:bg-[#00205B] hover:text-white transition">
               Choose Profile Picture
             </label>
-            <input
-              id="profile-pic"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
+            <input id="profile-pic" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
           </div>
 
           {showCropper && imageSrc && (
             <div className="relative w-full h-64 crop-container">
-              <Cropper
-                image={imageSrc}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
+              <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
               <div className="crop-overlay-circle"></div>
-              <button
-                type="button"
-                className="absolute bottom-2 right-2 bg-[#00205B] text-white px-3 py-1 rounded hover:opacity-90 transition"
-                onClick={showCroppedImage}
-              >
-                Crop
-              </button>
+              <button type="button" className="absolute bottom-2 right-2 bg-[#00205B] text-white px-3 py-1 rounded hover:opacity-90 transition" onClick={showCroppedImage}>Crop</button>
             </div>
           )}
 
@@ -199,7 +145,7 @@ export const RegisterUser = () => {
           <input name="password" type="password" value={authObject.password} onChange={handleChange} placeholder="Password" minLength={6} required autoComplete="new-password" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" />
           <input name="confirmPassword" type="password" value={authObject.confirmPassword} onChange={handleChange} placeholder="Confirm Password" minLength={6} required autoComplete="new-password" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" />
 
-          <button type="button" onClick={createUserWithEmailAndPasswordFunction} className="w-full bg-[#00205B] hover:bg-[#001A4A] text-white py-2 rounded transition">
+          <button type="button" onClick={handleRegister} className="w-full bg-[#00205B] hover:bg-[#001A4A] text-white py-2 rounded transition">
             Create Account
           </button>
         </form>

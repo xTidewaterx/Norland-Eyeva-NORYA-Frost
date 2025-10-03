@@ -11,6 +11,7 @@ import { useAuth } from '../auth/authContext';
 import { GoogleSignIn } from '../auth/GoogleSignIn';
 import { RegisterUser } from '../auth/Register';
 import { SignInUser } from '../auth/SignIn';
+import PostProduct from '../post/PostProduct'
 
 const uid = 'user1'; // Replace with dynamic Firebase UID later
 
@@ -219,6 +220,8 @@ const ImageCropUploader = () => {
       </div>
 
       <RegisterUser />
+      <PostProduct />
+
     </div>
   );
 };
