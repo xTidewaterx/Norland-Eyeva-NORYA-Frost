@@ -86,6 +86,7 @@ export const RegisterUser = () => {
       }
 
       // Call backend API to create user safely
+      //await the result of an asynchronous function call
       const res = await fetch("/api/registerUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
