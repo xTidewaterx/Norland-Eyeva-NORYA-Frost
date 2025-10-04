@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-
 import React, { useState, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
@@ -11,7 +10,8 @@ import { useAuth } from '../auth/authContext';
 import { GoogleSignIn } from '../auth/GoogleSignIn';
 import { RegisterUser } from '../auth/Register';
 import { SignInUser } from '../auth/SignIn';
-import PostProduct from '../post/PostProduct'
+import PostProduct from '../post/PostProduct';
+import { getFirestore, doc, updateDoc } from 'firebase/firestore'; // ✅ Added Firestore imports
 
 const uid = 'user1'; // Replace with dynamic Firebase UID later
 
@@ -25,6 +25,7 @@ const ImageCropUploader = () => {
   const [showHalo, setShowHalo] = useState(false);
 
   const auth = getAuth();
+  const db = getFirestore(); // ✅ Firestore instance
   const user = auth.currentUser;
   const { user: contextUser } = useAuth();
 
@@ -63,12 +64,28 @@ const ImageCropUploader = () => {
     await uploadBytes(storageRef, blob);
     const downloadURL = await getDownloadURL(storageRef);
 
+    // ✅ Update Auth profile
     await updateProfile(user, {
       displayName: newName || user.displayName,
-      photoURL: downloadURL, // ✅ Fixed: now reflects in auth.currentUser.photoURL
+      photoURL: downloadURL,
     });
 
-    alert('Profile updated successfully!');
+    // ✅ Update Firestore in both 'users' and 'publicUsers'
+    try {
+      const userDocRef = doc(db, 'users', user.uid);
+      const publicUserDocRef = doc(db, 'publicUsers', user.uid);
+
+      await Promise.all([
+        updateDoc(userDocRef, { photoURL: downloadURL }),
+        updateDoc(publicUserDocRef, { photoURL: downloadURL }),
+      ]);
+
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating Firestore documents:', error);
+      alert('Profile updated in auth, but failed to update Firestore.');
+    }
+
     setEditing(false);
   };
 
@@ -221,7 +238,6 @@ const ImageCropUploader = () => {
 
       <RegisterUser />
       <PostProduct />
-
     </div>
   );
 };
