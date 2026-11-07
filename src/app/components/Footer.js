@@ -1,34 +1,28 @@
-'use client';
+import Link from "next/link";
+import "../styles/footer.css";
 
-import Link from 'next/link';
+const footerLinks = [
+  { href: "/omoss", label: "Om NORYA" },
+  { href: "/kontakt", label: "Kontakt" },
+  { href: "/kjopsvilkar", label: "Kjøpsvilkår" },
+  { href: "/personvern", label: "Personvern" },
+  { href: "/angrerett", label: "Angrerett" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#001f3f] text-white py-8 px-4">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-        {/* Logo Section */}
-        <Link href="/" className="mb-4 md:mb-0 flex items-center space-x-2 group">
-          <img
-            src="/norland-logo.png"
-            alt="Norland Logo"
-            className="w-10 h-10 group-hover:invert"
-          />
-          <span className="text-lg font-semibold text-yellow-400 group-hover:text-yellow-300 transition-colors">
-            Norland
-          </span>
-        </Link>
-
-        {/* Footer Nav */}
-        <div className="flex space-x-6 text-sm font-light text-gray-300">
-          <Link href="/about" className="hover:text-yellow-400 transition-colors">Om Oss</Link>
-          <Link href="/contact" className="hover:text-yellow-400 transition-colors">Kontakt</Link>
-          <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Personvern</Link>
-        </div>
-      </div>
-
-      {/* Bottom Strip */}
-      <div className="mt-6 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} Norland. All rights reserved.
+    <footer className="footer-container">
+      <div className="footer-content">
+        <p className="footer-text">
+          © {new Date().getFullYear()} NORYA. Norsk håndverk, nøye utvalgt.
+        </p>
+        <nav className="footer-links" aria-label="Footer">
+          {footerLinks.map(({ href, label }) => (
+            <Link className="footer-link" href={href} key={href}>
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );

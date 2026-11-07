@@ -3,7 +3,6 @@
 export function getCroppedImg(imageSrc, crop) {
   return new Promise((resolve, reject) => {
     const image = new Image()
-    image.src = imageSrc
 
     image.onload = () => {
       const canvas = document.createElement('canvas')
@@ -42,5 +41,7 @@ export function getCroppedImg(imageSrc, crop) {
     image.onerror = () => {
       reject(new Error('Failed to load image'))
     }
+
+    image.src = imageSrc
   })
 }
