@@ -1,89 +1,95 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { auth, provider } from "../firebaseConfig";
-import { signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
-import { app } from "../firebaseConfig";
+import {
+  signInWithPopup,
+  onAuthStateChanged,
+  getAuth,
+  signOut,
+} from "firebase/auth";
+import { app, provider } from "../../firebase/firebaseConfig";
 
-export function GoogleSignIn() {
+export function GoogleSignIn({ role }) {
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const firebaseAuth = getAuth(app);
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-
-        // 🔥 Firestore profile sync
-        const db = getFirestore(app);
-        const userRef = doc(db, "users", firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-          await setDoc(userRef, {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName || "",
-            photoURL: firebaseUser.photoURL || "",
-            createdAt: new Date(),
-          });
-          console.log("📦 Firestore profile created for:", firebaseUser.email);
-        }
-      } else {
-        setUser(null);
-      }
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
+      setUser(firebaseUser);
     });
 
-    
-
     return () => unsubscribe();
-  }, []);
+  }, [firebaseAuth]);
 
   const handleGoogleSignIn = async () => {
+    setIsSigningIn(true);
+    setErrorMessage("");
+    sessionStorage.setItem("norya_google_profile_setup", "true");
     try {
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-      setErrorMessage("");
-      console.log("✅ Signed in:", result.user);
+      const result = await signInWithPopup(firebaseAuth, provider);
+      const signedInUser = result.user;
+      const idToken = await signedInUser.getIdToken();
+      const response = await fetch("/api/complete-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ role: role || "civilian" }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Profilen kunne ikke opprettes.");
+      }
+
+      const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+      const target =
+        returnTo?.startsWith("/") && !returnTo.startsWith("//")
+          ? new URL(returnTo, window.location.origin)
+          : null;
+      const destination =
+        target?.origin === window.location.origin
+          ? `${target.pathname}${target.search}${target.hash}`
+          : "/profile";
+      window.location.replace(destination);
     } catch (error) {
-      setErrorMessage(error.message);
-      console.error("❌ Sign-in error:", error.message);
+      setErrorMessage(error.message || "Google-innloggingen mislyktes.");
+      console.error("Google sign-in or profile provisioning failed:", error);
+      if (firebaseAuth.currentUser) {
+        try {
+          await signOut(firebaseAuth);
+        } catch (signOutError) {
+          console.error("Could not sign out after profile provisioning failed:", signOutError);
+        }
+      }
+    } finally {
+      sessionStorage.removeItem("norya_google_profile_setup");
+      setIsSigningIn(false);
     }
   };
 
   return (
-    <section className="flex flex-col items-center justify-center  dark:bg-gray-900 px-4">
-      <div className="max-w-sm w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
-        {user ? (
-          <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Welcome, {user.displayName}
-            </h2>
-            <img
-              src={user.photoURL}
-              alt="Profile"
-              className="w-16 h-16 rounded-full mx-auto"
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-300">{user.email}</p>
-          </div>
-        ) : (
-  <button
-  onClick={handleGoogleSignIn}
-  className="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm transition duration-200"
->
-  <img
-    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-    alt="Google logo"
-    className="w-5 h-5"
-  />
-  <span>Sign in with Google</span>
-</button>
-        )}
-        {errorMessage && (
-          <p className="text-sm text-red-500 text-center">{errorMessage}</p>
-        )}
-      </div>
-    </section>
+    <>
+      {!user && (
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={isSigningIn}
+          className="rounded-full border border-slate-300 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-white flex items-center justify-center gap-2"
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google logo"
+            className="w-5 h-5"
+          />
+          {isSigningIn ? "Oppretter profil..." : "Fortsett med Google"}
+        </button>
+      )}
+      {errorMessage && (
+        <p className="text-sm text-red-500 text-center">{errorMessage}</p>
+      )}
+    </>
   );
 }
