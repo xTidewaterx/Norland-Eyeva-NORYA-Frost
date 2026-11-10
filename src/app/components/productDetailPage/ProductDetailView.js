@@ -17,6 +17,17 @@ export default function ProductDetailView({ completeProduct, id, ownerPreview = 
   const currency = completeProduct.currency ? completeProduct.currency.toUpperCase() : "NOK";
   const colors = ["#4B2C20", "#E4C5B6"];
   const creator = completeProduct.artist || "Leonora Stensheim";
+  const specifications = Array.isArray(completeProduct.specifications)
+    ? completeProduct.specifications.filter(
+        (item) => item?.label && item?.value
+      )
+    : [];
+  const hasProductInformation = Boolean(
+    completeProduct.category ||
+      completeProduct.stock !== undefined ||
+      completeProduct.dimensions ||
+      completeProduct.weight
+  );
 
   return (
     <div className="grid grid-cols-1 gap-8 items-start lg:grid-cols-[1.6fr_1fr]">
@@ -51,37 +62,66 @@ export default function ProductDetailView({ completeProduct, id, ownerPreview = 
             {price} {currency}
           </p>
 
-          {/* Product specifications */}
-          <div className="mb-6 space-y-3">
-            {completeProduct.category && (
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <span className="font-medium text-slate-900">Kategori:</span>
-                <span>{completeProduct.category}</span>
-              </div>
-            )}
-            {completeProduct.stock !== undefined && (
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <span className="font-medium text-slate-900">Lagerstatus:</span>
-                <span className={completeProduct.stock > 0 ? 'text-green-700' : 'text-red-700'}>
-                  {completeProduct.stock > 0 ? `På lager (${completeProduct.stock})` : 'Utsolgt'}
-                </span>
-              </div>
-            )}
-            {completeProduct.dimensions && (
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <span className="font-medium text-slate-900">Mål:</span>
-                <span>{typeof completeProduct.dimensions === 'object' 
-                  ? `${completeProduct.dimensions.length || ''} x ${completeProduct.dimensions.width || ''} x ${completeProduct.dimensions.height || ''} cm`
-                  : completeProduct.dimensions}</span>
-              </div>
-            )}
-            {completeProduct.weight && (
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <span className="font-medium text-slate-900">Vekt:</span>
-                <span>{completeProduct.weight} kg</span>
-              </div>
-            )}
-          </div>
+          {(hasProductInformation || specifications.length > 0) && (
+            <div className="mb-6 divide-y divide-slate-200 border-y border-slate-200">
+              {hasProductInformation && (
+                <details className="group py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-slate-900 [&::-webkit-details-marker]:hidden">
+                    Produktinformasjon
+                    <span aria-hidden="true" className="text-slate-500 transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <div className="mt-2 divide-y divide-slate-100">
+                    {completeProduct.category && (
+                      <div className="flex justify-between gap-4 py-3 text-sm text-slate-600">
+                        <span>Kategori</span>
+                        <span className="text-right text-slate-800">{completeProduct.category}</span>
+                      </div>
+                    )}
+                    {completeProduct.stock !== undefined && (
+                      <div className="flex justify-between gap-4 py-3 text-sm text-slate-600">
+                        <span>Lagerstatus</span>
+                        <span className={completeProduct.stock > 0 ? "text-right text-green-700" : "text-right text-red-700"}>
+                          {completeProduct.stock > 0 ? `På lager (${completeProduct.stock})` : "Utsolgt"}
+                        </span>
+                      </div>
+                    )}
+                    {completeProduct.dimensions && (
+                      <div className="flex justify-between gap-4 py-3 text-sm text-slate-600">
+                        <span>Mål</span>
+                        <span className="text-right text-slate-800">
+                          {typeof completeProduct.dimensions === "object"
+                            ? `${completeProduct.dimensions.length || ""} x ${completeProduct.dimensions.width || ""} x ${completeProduct.dimensions.height || ""} cm`
+                            : completeProduct.dimensions}
+                        </span>
+                      </div>
+                    )}
+                    {completeProduct.weight && (
+                      <div className="flex justify-between gap-4 py-3 text-sm text-slate-600">
+                        <span>Vekt</span>
+                        <span className="text-right text-slate-800">{completeProduct.weight} kg</span>
+                      </div>
+                    )}
+                  </div>
+                </details>
+              )}
+              {specifications.length > 0 && (
+                <details className="group py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-slate-900 [&::-webkit-details-marker]:hidden">
+                    Produktspesifikasjon
+                    <span aria-hidden="true" className="text-slate-500 transition group-open:rotate-180">⌄</span>
+                  </summary>
+                  <dl className="mt-2 divide-y divide-slate-100">
+                    {specifications.map((item, index) => (
+                      <div key={`${item.label}-${index}`} className="flex justify-between gap-4 py-3 text-sm">
+                        <dt className="text-slate-600">{item.label}</dt>
+                        <dd className="text-right text-slate-800">{item.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
+              )}
+            </div>
+          )}
 
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-2 text-sm font-medium text-slate-600">Farge:</div>
@@ -121,9 +161,6 @@ export default function ProductDetailView({ completeProduct, id, ownerPreview = 
           >
             Gå til handlekurv
           </Link>
-          <div className="text-xs text-slate-500">
-            Spesifikasjoner (klikk for utvidelse)
-          </div>
         </div>
       </div>
     </div>

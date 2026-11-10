@@ -5,6 +5,7 @@ import {
   isProductPreviewEnabled,
   PRODUCT_PREVIEW_STOCK,
 } from "../../lib/productPreview";
+import { normalizeProductSpecifications } from "../../../lib/productSpecifications";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -145,6 +146,7 @@ export async function GET(req) {
         category: projection.category || "",
         dimensions: projection.dimensions || null,
         weight: projection.weight ?? null,
+        specifications: projection.specifications || [],
         sellerAccountId,
         approved: productPreviewEnabled || (productApproved && sellerReady),
         notPublic: projection.notPublic === true,
@@ -190,6 +192,7 @@ export async function GET(req) {
         category: data.category || "",
         dimensions: data.dimensions || null,
         weight: data.weight || null,
+        specifications: data.specifications || [],
         metadata: {
           creatorId: data.creatorId || "",
           sellerAccountId: data.sellerId || "",
@@ -248,7 +251,16 @@ export async function POST(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const { name, description, price, images } = await req.json();
+    const { name, description, price, images, specifications } = await req.json();
+    const normalizedSpecifications =
+      normalizeProductSpecifications(specifications);
+
+    if (!normalizedSpecifications.valid) {
+      return NextResponse.json(
+        { error: "Product specifications must have a label and value (up to 20 entries)." },
+        { status: 400 }
+      );
+    }
 
     if (
       typeof name !== "string" ||
@@ -322,9 +334,11 @@ const product = await stripe.products.create({
         category: "",
         dimensions: null,
         weight: null,
+        specifications: normalizedSpecifications.specifications || [],
       });
     } catch (err) {
-      console.warn("⚠️ [products] Firestore projection write failed:", err.message);
+      console.error("❌ [products] Firestore projection write failed:", err);
+      throw new Error("Product could not be saved to the marketplace catalog.");
     }
 
     // Also create/update seller document
@@ -378,9 +392,19 @@ export async function PATCH(req) {
       category,
       dimensions,
       weight,
+      specifications,
       approved
     } = await req.json();
-    console.log("PATCH request received:", { id, images, price, metadata, story, stock, category, dimensions, weight, approved });
+    console.log("PATCH request received:", { id, images, price, metadata, story, stock, category, dimensions, weight, specifications, approved });
+
+    const normalizedSpecifications =
+      normalizeProductSpecifications(specifications);
+    if (!normalizedSpecifications.valid) {
+      return NextResponse.json(
+        { error: "Product specifications must have a label and value (up to 20 entries)." },
+        { status: 400 }
+      );
+    }
 
     if (!id) {
       return NextResponse.json(
@@ -461,6 +485,9 @@ export async function PATCH(req) {
       if (category !== undefined) updateData.category = category;
       if (dimensions !== undefined) updateData.dimensions = dimensions;
       if (weight !== undefined) updateData.weight = weight;
+      if (normalizedSpecifications.specifications !== undefined) {
+        updateData.specifications = normalizedSpecifications.specifications;
+      }
       if (approved !== undefined) updateData.approved = approved;
       await db.collection("products").doc(id).update(updateData);
     } catch (err) {

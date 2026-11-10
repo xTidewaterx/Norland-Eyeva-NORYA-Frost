@@ -924,7 +924,7 @@ export default function ProfilePage() {
 
 
         {isOwnProfile && (
-          <section className="rounded-[2rem] border border-[#e5e5ea] bg-white p-6 shadow-sm sm:p-10">
+          <section className="py-6 sm:py-10">
             <PaymentInfo activeTheme={activeTheme} />
           </section>
         )}

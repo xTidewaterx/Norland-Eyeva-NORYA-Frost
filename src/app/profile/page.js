@@ -999,8 +999,8 @@ return (
         )}
 
         {user && userRole === 'seller' && (
-          <section className="rounded-[2rem] border border-slate-200/70 bg-white/90 shadow-sm backdrop-blur-sm">
-            <div className="p-8 sm:p-10">
+          <section className="py-8 sm:py-10">
+            <div className="px-8 sm:px-10">
               <PaymentInfo activeTheme={activeTheme} userRole={userRole} />
             </div>
           </section>

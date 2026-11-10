@@ -1,5 +1,6 @@
 import Stripe from "stripe";
-import { authAdmin, db } from "../../../lib/firebaseAdmin";
+import { authAdmin, db, admin } from "../../../lib/firebaseAdmin";
+import { normalizeProductSpecifications } from "../../../../lib/productSpecifications";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -22,8 +23,19 @@ export async function POST(req) {
   try {
     console.log("✅ Received request at updateProduct.js");
 
-    const { id, name, description, images, price, metadata } = await req.json();
-    console.log("🧩 Parsed client request body:", { id, name, description, images, price, metadata });
+    const { id, name, description, images, price, metadata, specifications } = await req.json();
+    console.log("🧩 Parsed client request body:", { id, name, description, images, price, metadata, specifications });
+    const normalizedSpecifications =
+      normalizeProductSpecifications(specifications);
+
+    if (!normalizedSpecifications.valid) {
+      return new Response(
+        JSON.stringify({
+          error: "Product specifications must have a label and value (up to 20 entries).",
+        }),
+        { status: 400 }
+      );
+    }
 
     if (!id) {
       return new Response(JSON.stringify({ error: "Product ID is required" }), {
@@ -88,6 +100,32 @@ export async function POST(req) {
     console.log("🛠 Updating product on Stripe...");
     const updatedProduct = await stripe.products.update(id, productUpdatePayload);
     console.log("🎉 Stripe product updated successfully:", updatedProduct.id);
+
+    const projectionUpdate = {
+      title: name,
+      description: description || "",
+      images: images || [],
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    if (newPriceData) {
+      projectionUpdate.price = newPriceData.unit_amount;
+      projectionUpdate.currency = newPriceData.currency;
+      projectionUpdate.stripePriceId = newPriceData.id;
+    }
+    if (sellerAccountId) projectionUpdate.sellerId = sellerAccountId;
+    if (normalizedSpecifications.specifications !== undefined) {
+      projectionUpdate.specifications = normalizedSpecifications.specifications;
+    }
+
+    try {
+      await db.collection("products").doc(id).set(projectionUpdate, { merge: true });
+    } catch (error) {
+      console.error("[updateProduct] Firestore product projection sync failed:", error);
+      return new Response(
+        JSON.stringify({ error: "Product was updated in Stripe but could not be saved to the marketplace catalog." }),
+        { status: 500 }
+      );
+    }
 
     return new Response(
       JSON.stringify({

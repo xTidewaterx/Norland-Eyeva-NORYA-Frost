@@ -39,6 +39,7 @@ export default async function ProductDetail({ params, searchParams }) {
     category: product.category,
     dimensions: product.dimensions,
     weight: product.weight,
+    specifications: product.specifications || [],
     price: product.priceNok ?? product.price ?? 0,
     currency: product.currency || 'nok',
     creatorId: product.creatorId || product.metadata?.creatorId,

@@ -63,6 +63,7 @@ export default function OwnerProductFallback({ id, isEditing }) {
     category: product.category,
     dimensions: product.dimensions,
     weight: product.weight,
+    specifications: product.specifications || [],
     price: product.price ?? 0,
     currency: product.currency || 'nok',
     creatorId: product.creatorId || product.metadata?.creatorId,
